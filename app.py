@@ -1,32 +1,54 @@
-from flask import Flask, render_template
-import requests
-from flask_restful import Api
-from flask_cors import CORS
-from config import config
-from decouple import config as config_decouple
+import os
 
-# Enviroment check (DEV/PROD)
-enviroment = config['development']
+import boto3
+from flask import Flask, jsonify, make_response, request
 
-if config_decouple('PRODUCTION', cast=bool, default=False):
-    enviroment = config['production']
-
-# App initialization
 app = Flask(__name__)
-app.config.from_object(enviroment)
-
-# App config definition
-
-# App's api definition
-api = Api(app)
-
-# Cors init
-CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-# Resources
+if os.environ.get('IS_OFFLINE'):
+    dynamodb_client = boto3.client(
+        'dynamodb',
+        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        region_name='localhost',
+        endpoint_url='http://localhost:8000'
+    )
+else:
+    dynamodb_client = boto3.client('dynamodb', region_name="us-east-1")
 
-# Test
-@app.route('/')
-def hello():
-    return 'Hello'
+
+USERS_TABLE = os.environ['USERS_TABLE']
+
+
+@app.route('/users/<string:user_id>')
+def get_user(user_id):
+    result = dynamodb_client.get_item(
+        TableName=USERS_TABLE, Key={'userId': {'S': user_id}}
+    )
+    item = result.get('Item')
+    if not item:
+        return jsonify({'error': 'Could not find user with provided "userId"'}), 404
+
+    return jsonify(
+        {'userId': item.get('userId').get('S'), 'name': item.get('name').get('S')}
+    )
+
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    user_id = request.json.get('userId')
+    name = request.json.get('name')
+    if not user_id or not name:
+        return jsonify({'error': 'Please provide both "userId" and "name"'}), 400
+
+    dynamodb_client.put_item(
+        TableName=USERS_TABLE, Item={'userId': {'S': user_id}, 'name': {'S': name}}
+    )
+
+    return jsonify({'userId': user_id, 'name': name})
+
+
+@app.errorhandler(404)
+def resource_not_found(e):
+    return make_response(jsonify(error='Not found!'), 404)
