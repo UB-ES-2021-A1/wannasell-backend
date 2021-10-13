@@ -1,0 +1,1 @@
+web: gunicorn wannasellbackend.wsgi --log-file -
