@@ -126,4 +126,4 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if config('DJANGO_PRODUCTION_ENV', default=False, cast=bool):
-    from settings_prod import *
+    from .settings_prod import *
