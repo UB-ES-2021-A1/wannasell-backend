@@ -19,7 +19,6 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -27,5 +26,7 @@ urlpatterns = [
     url(r'^api/v1/auth/', include('rest_auth.urls')),
     url(r'^api/v1/auth/register/', include('rest_auth.registration.urls')),
     url(r'^api/v1/auth/register/confirm/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
-    url(r'^api/v1/profiles/', include('django.contrib.auth.urls')),
+    url(r'^api/v1/accounts/', include('django.contrib.auth.urls')),
+
+    url(r'^api/v1/profiles/', include('profiles.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'profiles',
     'allauth.socialaccount',
+    'django.contrib.postgres'
 ]
 
 MIDDLEWARE = [
