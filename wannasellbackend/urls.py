@@ -28,5 +28,5 @@ urlpatterns = [
     url(r'^api/v1/auth/register/confirm/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
     url(r'^api/v1/accounts/', include('django.contrib.auth.urls')),
 
-    url(r'^api/v1/profiles/', include('profiles.urls'))
+    url(r'^api/v1/profile/', include('profiles.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
