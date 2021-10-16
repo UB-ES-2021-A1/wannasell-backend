@@ -1,23 +1,27 @@
-import rest_framework.status
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, status
+from rest_framework.views import APIView
 
 import profiles
 from profiles.models import Profile
-from django.core import serializers
-from django.forms.models import model_to_dict
-
-# Create your views here.
 from profiles.serializers import ProfileDetailsSerializer
 
 
 class ProfileView(APIView):
+    """
+        Reads and updates Profile fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: avatar, bio, address
+        Default display fields: id, avatar, bio, address
+        Read-only fields: id
+
+        Returns Profile fields.
+    """
+
     serializer_class = ProfileDetailsSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -93,6 +97,15 @@ class ProfileView(APIView):
 
 
 class ProfileIdView(APIView):
+    """
+        Reads Profile fields
+        Accepts GET method.
+
+        Default display fields: id, avatar, bio, address
+
+        Returns Profile fields.
+    """
+
     serializer_class = ProfileDetailsSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = [TokenAuthentication, SessionAuthentication]
