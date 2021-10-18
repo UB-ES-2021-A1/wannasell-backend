@@ -5,13 +5,17 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class Product(models.Model):
-    title = models.TextField(max_length=500, blank=False)
-    description = models.TextField(max_length=1000, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+def category_gray_image_path(instance):
+    return 'categories/gray/{0}'.format(instance.category)
 
-    class Category(models.TextChoices):
+
+def category_green_image_path(instance):
+    return 'categories/green/{0}'.format(instance.category)
+
+
+class Category(models.Model):
+
+    class CategoryValues(models.TextChoices):
         COCHES = 'CO', _('Coches')
         MOTOS = 'MO', _('Motos')
         MODA = 'MA', _('Moda y Accesorios')
@@ -35,13 +39,21 @@ class Product(models.Model):
 
     category = models.CharField(
         max_length=2,
-        choices=Category.choices,
-        default=Category.OTROS
+        choices=CategoryValues.choices,
+        default=CategoryValues.OTROS
     )
+    grayscale_image = models.ImageField(upload_to=category_gray_image_path, blank=False)
+    green_image = models.ImageField(upload_to=category_green_image_path, blank=False)
+
+
+class Product(models.Model):
+    title = models.TextField(max_length=500, blank=False)
+    description = models.TextField(max_length=1000, blank=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 
 class Image (models.Model):
     product = models.ForeignKey(Product, default=None, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='products/%Y/%m/%d', blank=True)
-
-
