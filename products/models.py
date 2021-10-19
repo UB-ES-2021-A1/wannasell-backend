@@ -5,12 +5,12 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-def category_gray_image_path(instance):
-    return 'categories/gray/{0}'.format(instance.category)
+def category_gray_image_path(instance, filename):
+    return 'categories/gray/{0}/{1}'.format(instance.name, filename)
 
 
-def category_green_image_path(instance):
-    return 'categories/green/{0}'.format(instance.category)
+def category_green_image_path(instance, filename):
+    return 'categories/green/{0}/{1}'.format(instance.name, filename)
 
 
 class Category(models.Model):
@@ -37,7 +37,7 @@ class Category(models.Model):
         SERVICIOS = 'SE', _('Servicios')
         OTROS = 'OT', _('Otros')
 
-    category = models.CharField(
+    name = models.CharField(
         max_length=2,
         choices=CategoryValues.choices,
         default=CategoryValues.OTROS
@@ -45,6 +45,8 @@ class Category(models.Model):
     grayscale_image = models.ImageField(upload_to=category_gray_image_path, blank=False)
     green_image = models.ImageField(upload_to=category_green_image_path, blank=False)
 
+    def __str__(self):
+        return self.get_name_display()
 
 class Product(models.Model):
     title = models.TextField(max_length=500, blank=False)
@@ -52,6 +54,9 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 
 class Image (models.Model):
