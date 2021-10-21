@@ -19,7 +19,6 @@ class Profile(models.Model):
         permissions = (
             ('modify_other_profiles', 'Allows the user to modify other profiles (Admin Access)'),
         )
-
     def __str__(self):
         return self.user.username
 
