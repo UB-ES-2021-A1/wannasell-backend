@@ -13,11 +13,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from allauth.account.views import confirm_email
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
-
+from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Auth api urls
+    url(r'^api/v1/auth/', include('rest_auth.urls')),
+    url(r'^api/v1/auth/register/', include('rest_auth.registration.urls')),
+    url(r'^api/v1/auth/register/confirm/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
+    url(r'^api/v1/accounts/', include('django.contrib.auth.urls')),
+
+
+    url(r'^api/v1/profiles/', include('profiles.urls')),
+    url(r'^api/v1/profile/', include('profiles.urls')),
+
+    path('api/v1/products/', include('products.urls'))
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
