@@ -17,9 +17,9 @@ class ProductDataSerializer(serializers.ModelSerializer):
 
 
 class CategoryDataSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(max_length=2)
+    name = serializers.CharField(max_length=2)
 
 
     class Meta:
         model = Category
-        fields = ['category']
+        fields = ['name']
