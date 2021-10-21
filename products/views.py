@@ -2,18 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from products.serializers import ProductDataSerializer, CategoryDataSerializer
-import json
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from products.models import Product, Category
 
+
 # Create your views here.
 
 
 class ProductsView(APIView):
-
     serializer_class = ProductDataSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -22,22 +21,25 @@ class ProductsView(APIView):
         """
         Return a list of all the products
         """
-        category = request.GET.get('category')
-        if category:
-            cat = Category.objects.get(name=category)
-            products = list(Product.objects.filter(category=cat))
+        try:
+            category = request.GET.get('category')
+
+            if category:
+                cat = Category.objects.get(name=category)
+                products = list(Product.objects.filter(category=cat))
+                products_serialized = [ProductDataSerializer(prod).data for prod in products]
+                response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
+                return Response(products_serialized, status=response_status)
+
+            products = list(Product.objects.all())
             products_serialized = [ProductDataSerializer(prod).data for prod in products]
             response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
             return Response(products_serialized, status=response_status)
-
-        products = list(Product.objects.all())
-        products_serialized = [ProductDataSerializer(prod).data for prod in products]
-        response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
-        return Response(products_serialized, status=response_status)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CategoriesView(APIView):
-
     permission_classes = (IsAuthenticated,)
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
