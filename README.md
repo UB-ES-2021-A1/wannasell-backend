@@ -27,10 +27,10 @@
   <p align="center">
     A better way to sell your unused products
     <br />
-    <a href="https://github.com/UB-ES-2021-A1/wannasell-backend"><strong>Explore the docs »</strong></a>
+    <a href="https://documenter.getpostman.com/view/10967880/UV5WDdBm"><strong>Explore the API docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/UB-ES-2021-A1/wannasell-backend">View Demo</a>
+    <a href="https://wannasell-backend.herokuapp.com/admin">View Demo</a>
     ·
     <a href="https://github.com/UB-ES-2021-A1/wannasell-backend/issues">Report Bug</a>
     ·
