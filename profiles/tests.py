@@ -24,7 +24,9 @@ class ProfileTestCase(TestCase):
 
         # Add authorization to the requests headers
         self.client = APIClient()
+        self.adminClient = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.adminClient.credentials(HTTP_AUTHORIZATION='Token ' + self.adminToken)
 
     def test_profile_get_info(self):
         request = self.client.get('/api/v1/profile/')
@@ -59,16 +61,13 @@ class ProfileTestCase(TestCase):
         assert profile.address != 'test2address'
 
     def test_profile_patch_other_info(self):
-        # Set Admin token
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.adminToken)
-
         data = {
             'bio': 'test2bio',
             'address': 'test2address'
         }
-        request = self.client.patch('/api/v1/profile/?username=testAdmin', data, format='json')
+        request = self.adminClient.patch('/api/v1/profile/?username=testUser2', data, format='json')
 
-        assert request.status_code == 401
+        assert request.status_code == 200
 
         # Retrieve new Profile object
         profile = Profile.objects.get(user=self.user)
