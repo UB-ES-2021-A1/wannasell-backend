@@ -12,7 +12,9 @@ class ProfileTestCase(TestCase):
     def setUp(self):
         # Create User and Auth Token
         self.user = User.objects.create_user('testUser2', 'lennon@thebeatles.com', 'johnpassword')
+        self.admin_user = User.objects.create_superuser('testAdmin', 'admin@admin.es', 'testAdminPassword')
         self.token = Token.objects.get_or_create(user=self.user)[0].__str__()
+        self.adminToken = Token.objects.get_or_create(user=self.admin_user)[0].__str__()
 
         # Get and define user's profile attributes
         self.profile = Profile.objects.get(user=self.user)
@@ -41,3 +43,17 @@ class ProfileTestCase(TestCase):
         profile = Profile.objects.get(user=self.user)
         assert profile.bio == 'test2bio'
         assert profile.address == 'test2address'
+
+    def test_profile_patch_other_info_no_perms(self):
+        data = {
+            'bio': 'test2bio',
+            'address': 'test2address'
+        }
+        request = self.client.patch('/api/v1/profile/?username=testAdmin', data, format='json')
+
+        assert request.status_code == 401
+
+        # Retrieve new Profile object
+        profile = Profile.objects.get(user=self.user)
+        assert profile.bio != 'test2bio'
+        assert profile.address != 'test2address'
