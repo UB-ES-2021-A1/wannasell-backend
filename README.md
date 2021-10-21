@@ -38,6 +38,11 @@
   </p>
 </div>
 
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 
 
 <!-- TABLE OF CONTENTS -->
