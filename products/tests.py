@@ -17,25 +17,25 @@ class ProductsTestCase(TestCase):
     def test_get_products_succesfull(self):
         product = Product.objects.create(title='Title', description='Description', price=1, seller=self.user, category=self.category)
         product.save()
-        request = self.client.get('/api/v1/products/products/', format='json')
+        request = self.client.get('/api/v1/products/', format='json')
         self.assertEqual(request.status_code, 200)
 
     def test_get_empty_products(self):
-        request = self.client.get('/api/v1/products/products/', format='json')
+        request = self.client.get('/api/v1/products/', format='json')
         self.assertEqual(request.status_code, 204)
 
     def test_get_products_by_category_fail(self):
-        request = self.client.get("/api/v1/products/products/?category=MA", format='json')
+        request = self.client.get("/api/v1/products/?category=MA", format='json')
         self.assertEqual(request.status_code, 500)
 
     def test_get_products_by_category_success(self):
         product = Product.objects.create(title='Title', description='Description', price=1, seller=self.user, category=self.category)
         product.save()
-        request = self.client.get("/api/v1/products/products/?category=MO", format='json')
+        request = self.client.get("/api/v1/products/?category=MO", format='json')
         self.assertEqual(request.status_code, 200)
 
     def test_get_products_by_category_empty_success(self):
-        request = self.client.get("/api/v1/products/products/?category=MO", format='json')
+        request = self.client.get("/api/v1/products/?category=MO", format='json')
         self.assertEqual(request.status_code, 204)
 
     def test_get_category(self):
