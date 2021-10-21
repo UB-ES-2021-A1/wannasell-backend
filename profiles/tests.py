@@ -54,6 +54,23 @@ class ProfileTestCase(TestCase):
         assert request.status_code == 401
 
         # Retrieve new Profile object
-        profile = Profile.objects.get(user=self.user)
+        profile = Profile.objects.get(user=self.admin_user)
         assert profile.bio != 'test2bio'
         assert profile.address != 'test2address'
+
+    def test_profile_patch_other_info(self):
+        # Set Admin token
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.adminToken)
+
+        data = {
+            'bio': 'test2bio',
+            'address': 'test2address'
+        }
+        request = self.client.patch('/api/v1/profile/?username=testAdmin', data, format='json')
+
+        assert request.status_code == 401
+
+        # Retrieve new Profile object
+        profile = Profile.objects.get(user=self.user)
+        assert profile.bio == 'test2bio'
+        assert profile.address == 'test2address'
