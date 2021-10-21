@@ -85,8 +85,8 @@ class ProfileView(APIView):
                     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-        profile = Profile.objects.get(user=self.request.user)
+        else:
+            profile = Profile.objects.get(user=self.request.user)
 
         serializer = ProfileDetailsSerializer(instance=profile, data=request.data, partial=True)
 
