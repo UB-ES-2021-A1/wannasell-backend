@@ -4,10 +4,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from profiles.models import Profile
-# Create your tests here.
 from profiles.serializers import ProfileDetailsSerializer
 
 
+# TODO Add avatar testing cases (PUT profile missing)
 class ProfileTestCase(TestCase):
     def setUp(self):
         # Create User and Auth Token
@@ -18,7 +18,6 @@ class ProfileTestCase(TestCase):
         self.profile = Profile.objects.get(user=self.user)
         self.profile.bio = 'Test Bio'
         self.profile.address = 'Test Address'
-        # Need to add avatar
         self.profile.save()
 
         # Add authorization to the requests headers
@@ -26,10 +25,19 @@ class ProfileTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
 
     def test_profile_get_info(self):
-        request = self.client.get('/api/v1/profile/', format='json')
+        request = self.client.get('/api/v1/profile/')
         data = ProfileDetailsSerializer(request.data).data
         assert data.get('bio') == 'Test Bio'
         assert data.get('address') == 'Test Address'
-        # Don't know how to test avatar
 
+    def test_profile_patch_info(self):
+        data = {
+            'bio': 'test2bio',
+            'address': 'test2address'
+        }
+        request = self.client.patch('/api/v1/profile/', data, format='json')
 
+        # Retrieve new Profile object
+        profile = Profile.objects.get(user=self.user)
+        assert profile.bio == 'test2bio'
+        assert profile.address == 'test2address'
