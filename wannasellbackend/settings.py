@@ -25,7 +25,18 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dbugnj&ocqk#&50nuwg7q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '127.0.0.1:8000',
+    '127.0.0.1:8082',
+    'localhost',
+    'localhost:8000',
+    'localhost:8082',
+    'https://wannasell-backend.herokuapp.com/',
+    'https://wannasell.netlify.app/'
+]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 
