@@ -36,6 +36,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://wannasell.netlify.app'
 ]
 
+CSRF_COOKIE_DOMAIN = 'https://wannasell.netlify.app'
+
 CSRF_TRUSTED_ORIGINS = ['wannasell.netlify.app']
 
 
