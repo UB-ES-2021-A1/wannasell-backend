@@ -27,20 +27,14 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ALLOWED_ORIGINS = [
-    'http://62.57.219.90:8082',
-    'http://62.57.219.90',
-    'http://localhost:8082',
-    'http://127.0.0.1:8082',
-    'https://wannasell.netlify.app'
-]
-
-CSRF_TRUSTED_ORIGINS = {
-    'localhost:8082',
-    'http://127.0.0.1:8082'
-}
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8020',
+    '127.0.0.1:8020',
+    'wannasell.netlify.app'
+)
 
 CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_HTTPONLY = False
 
 # Application definition
 
