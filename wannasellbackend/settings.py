@@ -35,6 +35,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://wannasell.netlify.app'
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 # Application definition
 
 INSTALLED_APPS = [
