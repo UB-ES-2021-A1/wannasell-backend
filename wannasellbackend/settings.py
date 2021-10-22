@@ -31,6 +31,13 @@ ALLOWED_HOSTS = [
     '54.220.192.176'
 ]
 
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+  'http://62.57.219.90:8082',
+  'http://62.57.219.90',
+)
+
+
 # Application definition
 
 INSTALLED_APPS = [
