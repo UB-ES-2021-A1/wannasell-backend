@@ -31,9 +31,7 @@ ALLOWED_HOSTS = [
     '54.220.192.176'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 
 # Application definition
 
