@@ -42,6 +42,12 @@ CORS_ALLOWED_ORIGINS = [
     'https://wannasell.netlify.app'
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'localhost:8020',
+    '127.0.0.1:8020',
+    'wannasell.netlify.app'
+]
+
 
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_HTTPONLY = False
