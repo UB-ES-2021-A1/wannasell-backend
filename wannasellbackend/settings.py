@@ -27,23 +27,6 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ORIGIN_WHITELIST = (
-    'https://wannasell.netlify.app'
-)
-
-
-CORS_ALLOWED_ORIGINS = [
-    'https://wannasell.netlify.app'
-]
-
-CSRF_COOKIE_DOMAIN = 'https://wannasell.netlify.app'
-
-CSRF_TRUSTED_ORIGINS = ['wannasell.netlify.app']
-
-
-CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_HTTPONLY = False
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,10 +52,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
