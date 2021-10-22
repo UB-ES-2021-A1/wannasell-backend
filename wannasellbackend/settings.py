@@ -28,8 +28,8 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_WHITELIST = (
-    'localhost:8020',
-    '127.0.0.1:8020',
+    'localhost:8082',
+    '127.0.0.1:8082',
     'wannasell.netlify.app'
 )
 
