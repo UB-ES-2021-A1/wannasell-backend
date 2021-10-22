@@ -25,7 +25,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dbugnj&ocqk#&50nuwg7q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['https://wannasell.netlify.app']
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_WHITELIST = (
     'https://wannasell.netlify.app'
