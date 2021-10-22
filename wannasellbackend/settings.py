@@ -25,13 +25,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dbugnj&ocqk#&50nuwg7q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = [
-    '62.57.219.90',
-    '127.0.0.1',
-    '54.220.192.176'
-]
+ALLOWED_HOSTS = ['*']
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
