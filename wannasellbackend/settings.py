@@ -33,10 +33,10 @@ ALLOWED_HOSTS = [
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-  'http://62.57.219.90:8082',
-  'http://62.57.219.90',
+    'http://62.57.219.90:8082',
+    'http://62.57.219.90',
+    'http://localhost:8082'
 )
-
 
 # Application definition
 
