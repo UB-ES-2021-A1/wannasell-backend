@@ -35,6 +35,11 @@ CORS_ALLOWED_ORIGINS = [
     'https://wannasell.netlify.app'
 ]
 
+CSRF_TRUSTED_ORIGINS = {
+    'localhost:8082',
+    'http://127.0.0.1:8082'
+}
+
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
