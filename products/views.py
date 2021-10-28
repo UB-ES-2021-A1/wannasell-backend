@@ -9,8 +9,6 @@ from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_MET
 
 from products.models import Product, Category, Image
 
-from profiles.models import User
-
 # Create your views here.
 
 class ReadOnly(BasePermission):
@@ -61,8 +59,9 @@ class ProductsView(APIView):
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
         return Response(status=status.HTTP_200_OK)
 
+
 class CategoriesView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated|ReadOnly]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
@@ -76,17 +75,18 @@ class CategoriesView(APIView):
 
 
 class ImagesView(APIView):
+    permission_classes = (ReadOnly,)
 
     def get(self, request):
         """
         Return a list of the images of a product
         """
         try:
-            product = Product.objects.get(id=request.GET.id)
+            product = Product.objects.get(id=request.GET.get('id'))
         except Product.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        images = Image.objects.get(product=product)
+        images = Image.objects.filter(product=product)
         images_serialized = [ImageDataSerializer(im).data for im in images]
         response_status = status.HTTP_200_OK if images else status.HTTP_204_NO_CONTENT
         return Response(images_serialized, status=response_status)
