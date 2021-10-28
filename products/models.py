@@ -14,7 +14,7 @@ def category_green_image_path(instance, filename):
 
 
 def image_path(instance, filename):
-    return 'images/products/{0}/{1}/{2}'.format(instance.product.id, instance.id, filename)
+    return 'images/products/{0}/{1}'.format(instance.product.id, filename)
 
 
 class Category(models.Model):
