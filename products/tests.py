@@ -3,10 +3,12 @@ from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from products.models import Product, Category
+from products.models import Product, Category, Image
 
 
 # Create your tests here.
+from products.serializers import ImageDataSerializer
+
 
 class ProductsTestCase(TestCase):
     def setUp(self):
@@ -58,4 +60,17 @@ class ProductsTestCase(TestCase):
     def test_get_product_by_id(self):
         Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
         request = self.client.get("/api/v1/products/?id=1", format='json')
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_images_of_product(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        prod_id = (Product.objects.get(title='Title')).id
+        Image.objects.create(product=p, image='fake1')
+        Image.objects.create(product=p, image='fake2')
+
+        request = self.client.get("/api/v1/products/images/?id=" + str(prod_id), format='json')
+
+        images = request.data
+        assert len(images) == 2
         self.assertEqual(request.status_code, 200)
