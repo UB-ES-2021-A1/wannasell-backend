@@ -43,3 +43,19 @@ class ProductsTestCase(TestCase):
     def test_get_category(self):
         request = self.client.get("/api/v1/products/categories/")
         self.assertEqual(request.status_code, 200)
+
+    def test_post_product(self):
+        data = {
+            'title': 'Moto',
+            'description': 'Una moto',
+            'price': 12,
+            'user': self.u,
+            'category_name': 'MO'
+        }
+        request = self.client.post("/api/v1/products/", data)
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_product_by_id(self):
+        Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        request = self.client.get("/api/v1/products/?id=1", format='json')
+        self.assertEqual(request.status_code, 200)
