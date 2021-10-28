@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from products.models import Category, Product
+from products.models import Category, Product, Image
 from django.db import models
 
 
@@ -23,3 +23,12 @@ class CategoryDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name']
+
+
+class ImageDataSerializer(serializers.ModelSerializer):
+    product = ProductDataSerializer()
+    image = serializers.ImageField(allow_null=False)
+
+    class Meta:
+        model = Image
+        fields = ['id', 'product', 'image']
