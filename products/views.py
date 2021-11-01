@@ -1,3 +1,7 @@
+import ntpath
+
+from django.core.files import File
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -75,7 +79,8 @@ class CategoriesView(APIView):
 
 
 class ImagesView(APIView):
-    permission_classes = (ReadOnly,)
+    permission_classes = [IsAuthenticated | ReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
         """
@@ -90,3 +95,24 @@ class ImagesView(APIView):
         images_serialized = [ImageDataSerializer(im).data for im in images]
         response_status = status.HTTP_200_OK if images else status.HTTP_204_NO_CONTENT
         return Response(images_serialized, status=response_status)
+
+    def post(self, request):
+        """
+        Post an image for a certain product
+        """
+        file = request.GET.get('image')
+        prod_id = request.GET.get('id')
+        if not file or not prod_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=prod_id)
+        except Product.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            product_image = Image.objects.create(product=product)
+            product_image.image.save(ntpath.basename(file), File(open(file, 'rb')))
+        except:
+            return Response(status=status.HTTP_418_IM_A_TEAPOT)
+        return Response(status=status.HTTP_201_CREATED)
