@@ -33,8 +33,14 @@ class ProductsView(APIView):
         try:
             category = request.GET.get('category')
             id = request.GET.get('id')
+            search = request.GET.get('search')
 
-            if category:
+            if search and category:
+                cat = Category.objects.get(name=category)
+                products = list(Product.objects.filter(category=cat, title__icontains=search))
+            elif search:
+                products = list(Product.objects.filter(title__icontains=search))
+            elif category:
                 cat = Category.objects.get(name=category)
                 products = list(Product.objects.filter(category=cat))
             elif id:
