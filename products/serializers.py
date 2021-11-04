@@ -15,12 +15,18 @@ class ProductDataSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=6, decimal_places=2)
     category_name = serializers.CharField(source='category.name')
     category_description = serializers.CharField(source='category.get_name_display')
+    thumbnail = serializers.SerializerMethodField("get_thumbnail")
     seller = ProductSellerSerializer()
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'seller', 'category_name', 'category_description']
+        fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description']
 
+    def get_thumbnail(self, obj):
+        images = Image.objects.filter(product=obj)
+        if len(images) > 0:
+            return images.first().image.url
+        return None
 
 class CategoryDataSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=2)
