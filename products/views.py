@@ -6,12 +6,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+import products.models
 from products.serializers import ProductDataSerializer, CategoryDataSerializer, ImageDataSerializer
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 
 from products.models import Product, Category, Image
+
 
 # Create your views here.
 
@@ -23,7 +25,7 @@ class ReadOnly(BasePermission):
 class ProductsView(APIView):
     serializer_class = ProductDataSerializer
 
-    permission_classes = [IsAuthenticated|ReadOnly]
+    permission_classes = [IsAuthenticated | ReadOnly]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
@@ -33,8 +35,14 @@ class ProductsView(APIView):
         try:
             category = request.GET.get('category')
             id = request.GET.get('id')
+            search = request.GET.get('search')
 
-            if category:
+            if search and category:
+                cat = Category.objects.get(name=category)
+                products = list(Product.objects.filter(category=cat, title__icontains=search))
+            elif search:
+                products = list(Product.objects.filter(title__icontains=search))
+            elif category:
                 cat = Category.objects.get(name=category)
                 products = list(Product.objects.filter(category=cat))
             elif id:
@@ -64,8 +72,33 @@ class ProductsView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class ProductIdView(APIView):
+    """
+        Reads Profile fields
+        Accepts GET method.
+
+        Default display fields: id, avatar, bio, address
+
+        Returns Profile fields.
+    """
+
+    serializer_class = ProductDataSerializer
+
+    permission_classes = [IsAuthenticated | ReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request, id=None):
+        try:
+            product = Product.objects.get(id=id)
+        except products.models.Product.DoesNotExist:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if product:
+            serialized_profile = ProductDataSerializer(instance=product)
+            return Response(serialized_profile.data, status=status.HTTP_200_OK)
+
+
 class CategoriesView(APIView):
-    permission_classes = [IsAuthenticated|ReadOnly]
+    permission_classes = [IsAuthenticated | ReadOnly]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
