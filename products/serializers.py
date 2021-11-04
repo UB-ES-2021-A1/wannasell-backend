@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+
 from products.models import Category, Product, Image
-from django.db import models
+
+
+class ProductSellerSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=100)
+    first_name = serializers.CharField(max_length=500)
 
 
 class ProductDataSerializer(serializers.ModelSerializer):
@@ -10,15 +14,16 @@ class ProductDataSerializer(serializers.ModelSerializer):
     description = serializers.CharField(max_length=1000, allow_blank=True)
     price = serializers.DecimalField(max_digits=6, decimal_places=2)
     category_name = serializers.CharField(source='category.name')
+    category_description = serializers.CharField(source='category.get_name_display')
+    seller = ProductSellerSerializer()
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'seller', 'category_name']
+        fields = ['id', 'title', 'description', 'price', 'seller', 'category_name', 'category_description']
 
 
 class CategoryDataSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=2)
-
 
     class Meta:
         model = Category
