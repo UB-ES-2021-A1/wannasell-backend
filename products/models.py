@@ -6,11 +6,15 @@ from django.contrib.auth.models import User
 
 
 def category_gray_image_path(instance, filename):
-    return 'categories/gray/{0}/{1}'.format(instance.name, filename)
+    return 'images/categories/gray/{0}/{1}'.format(instance.name, filename)
 
 
 def category_green_image_path(instance, filename):
-    return 'categories/green/{0}/{1}'.format(instance.name, filename)
+    return 'images/categories/green/{0}/{1}'.format(instance.name, filename)
+
+
+def image_path(instance, filename):
+    return 'images/products/{0}/{1}'.format(instance.product.id, filename)
 
 
 class Category(models.Model):
@@ -61,4 +65,4 @@ class Product(models.Model):
 
 class Image (models.Model):
     product = models.ForeignKey(Product, default=None, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='products/%Y/%m/%d', blank=True)
+    image = models.ImageField(upload_to=image_path)

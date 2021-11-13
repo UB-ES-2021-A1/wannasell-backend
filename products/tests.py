@@ -3,10 +3,12 @@ from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from products.models import Product, Category
+from products.models import Product, Category, Image
 
 
 # Create your tests here.
+from products.serializers import ImageDataSerializer
+
 
 class ProductsTestCase(TestCase):
     def setUp(self):
@@ -43,3 +45,87 @@ class ProductsTestCase(TestCase):
     def test_get_category(self):
         request = self.client.get("/api/v1/products/categories/")
         self.assertEqual(request.status_code, 200)
+
+    def test_post_product(self):
+        data = {
+            'title': 'Moto',
+            'description': 'Una moto',
+            'price': 12,
+            'user': self.u,
+            'category_name': 'MO'
+        }
+        request = self.client.post("/api/v1/products/", data)
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_product_by_id(self):
+        Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        request = self.client.get("/api/v1/products/?id=1", format='json')
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_images_of_product(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        prod_id = (Product.objects.get(title='Title')).id
+        Image.objects.create(product=p, image='fake1')
+        Image.objects.create(product=p, image='fake2')
+
+        # Act
+        request = self.client.get("/api/v1/products/images/?id=" + str(prod_id), format='json')
+
+        # Assert
+        images = request.data
+        assert len(images) == 2
+        self.assertEqual(request.status_code, 200)
+
+    def test_post_product_image(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        prod_id = (Product.objects.get(title='Title')).id
+        path = "./assets/test.jpeg"
+        url = "/api/v1/products/images/?image=" + path + "&id=" + str(prod_id)
+
+        # Act
+        request = self.client.post(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 201)
+
+    def test_post_product_image_image_not_provided(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        prod_id = (Product.objects.get(title='Title')).id
+        url = "/api/v1/products/images/?id=" + str(prod_id)
+
+        # Act
+        request = self.client.post(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 400)
+
+    def test_post_product_image_id_not_provided(self):
+        # Arrange
+        path = "./assets/test.jpeg"
+        url = "/api/v1/products/images/?image=" + path
+
+        # Act
+        request = self.client.post(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 400)
+
+    def test_post_product_image_wrong_path(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        prod_id = (Product.objects.get(title='Title')).id
+        path = "wrongpath"
+        url = "/api/v1/products/images/?image=" + path + "&id=" + str(prod_id)
+
+        # Act
+        request = self.client.post(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 418)

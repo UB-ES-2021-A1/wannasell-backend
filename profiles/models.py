@@ -5,13 +5,13 @@ from django.dispatch import receiver
 
 
 def user_directory_path(instance, filename):
-    return 'static/images/avatars/{0}/{1}'.format(instance.user.id, filename)
+    return 'images/avatars/{0}/{1}'.format(instance.user.id, filename)
 
 
 # Define account model extras here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to=user_directory_path, default='static/images/default/avatar/default.png')
+    avatar = models.ImageField(upload_to=user_directory_path, default='images/default/avatar/default.png')
     bio = models.TextField(max_length=500, blank=True)
     address = models.TextField(max_length=1024, blank=True)
 
