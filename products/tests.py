@@ -1,4 +1,7 @@
+import tempfile
+
 from django.test import TestCase
+import PIL
 from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -78,19 +81,38 @@ class ProductsTestCase(TestCase):
         assert len(images) == 2
         self.assertEqual(request.status_code, 200)
 
-    def test_post_product_image(self):
+    def test_post_product_image_form(self):
         # Arrange
         p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
         p.save()
         prod_id = (Product.objects.get(title='Title')).id
-        path = "./assets/test.jpeg"
-        url = "/api/v1/products/images/?image=" + path + "&id=" + str(prod_id)
+        url = "/api/v1/products/images/?id=" + str(prod_id)
+
+        image = PIL.Image.new('RGB', (100, 100))
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        image.save(tmp_file)
+        tmp_file.seek(0)
 
         # Act
-        request = self.client.post(url)
+        request = self.client.post(url, {'image': tmp_file}, format="multipart")
 
         # Assert
         self.assertEqual(request.status_code, 201)
+
+    def test_post_product_image_id_not_provided(self):
+        # Arrange
+        url = "/api/v1/products/images/"
+
+        image = PIL.Image.new('RGB', (100, 100))
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        image.save(tmp_file)
+        tmp_file.seek(0)
+
+        # Act
+        request = self.client.post(url, {'image': tmp_file}, format="multipart")
+
+        # Assert
+        self.assertEqual(request.status_code, 400)
 
     def test_post_product_image_image_not_provided(self):
         # Arrange
@@ -100,32 +122,7 @@ class ProductsTestCase(TestCase):
         url = "/api/v1/products/images/?id=" + str(prod_id)
 
         # Act
-        request = self.client.post(url)
+        request = self.client.post(url, format="multipart")
 
         # Assert
         self.assertEqual(request.status_code, 400)
-
-    def test_post_product_image_id_not_provided(self):
-        # Arrange
-        path = "./assets/test.jpeg"
-        url = "/api/v1/products/images/?image=" + path
-
-        # Act
-        request = self.client.post(url)
-
-        # Assert
-        self.assertEqual(request.status_code, 400)
-
-    def test_post_product_image_wrong_path(self):
-        # Arrange
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        prod_id = (Product.objects.get(title='Title')).id
-        path = "wrongpath"
-        url = "/api/v1/products/images/?image=" + path + "&id=" + str(prod_id)
-
-        # Act
-        request = self.client.post(url)
-
-        # Assert
-        self.assertEqual(request.status_code, 418)
