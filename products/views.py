@@ -1,6 +1,10 @@
 import ntpath
+import operator
+from functools import reduce
 
 from django.core.files import File
+from django.db.models import QuerySet, Q
+from django.db.models.sql import AND
 
 from .forms import ImageForm
 
@@ -38,24 +42,25 @@ class ProductsView(APIView):
             category = request.GET.get('category')
             id = request.GET.get('id')
             search = request.GET.get('search')
+            seller = request.GET.get('seller')
+            qs = []
 
-            if search and category:
-                cat = Category.objects.get(name=category)
-                products = list(Product.objects.filter(category=cat, title__icontains=search))
-            elif search:
-                products = list(Product.objects.filter(title__icontains=search))
-            elif category:
-                cat = Category.objects.get(name=category)
-                products = list(Product.objects.filter(category=cat))
-            elif id:
-                products = Product.objects.filter(id=id)
-            else:
-                products = list(Product.objects.all())
+            if category is not None:
+                qs.append(Q(category__name=category))
+            if search is not None:
+                qs.append(Q(title__icontains=search))
+            if id is not None:
+                qs.append(Q(id=id))
+            if seller is not None:
+                qs.append(Q(seller__username=seller))
+
+            products = Product.objects.filter(reduce(operator.and_, qs)) if len(qs) > 0 else Product.objects.all()
 
             products_serialized = [ProductDataSerializer(prod).data for prod in products]
             response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
             return Response(products_serialized, status=response_status)
-        except:
+        except Exception as e:
+            print(e)
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
