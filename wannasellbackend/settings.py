@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'products',
     'corsheaders',
-    'storages'
+    'storages',
+    'favorites'
 ]
 
 MIDDLEWARE = [
