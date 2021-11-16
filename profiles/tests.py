@@ -16,6 +16,11 @@ class ProfileTestCase(TestCase):
         self.token = Token.objects.get_or_create(user=self.user)[0].__str__()
         self.adminToken = Token.objects.get_or_create(user=self.admin_user)[0].__str__()
 
+        # Create disabled user
+        self.disabled_user = User.objects.create_user('disabled', 'disabled@disabled.com', 'disabled')
+        self.disabled_user.is_active = False
+        self.disabled_user.save()
+
         # Get and define user's profile attributes
         self.profile = Profile.objects.get(user=self.user)
         self.profile.bio = 'Test Bio'
@@ -33,6 +38,14 @@ class ProfileTestCase(TestCase):
         data = ProfileDetailsSerializer(request.data).data
         assert data.get('bio') == 'Test Bio'
         assert data.get('address') == 'Test Address'
+
+    def test_profile_get_info_disabled(self):
+        request = self.client.get('/api/v1/profile/3/')
+        assert request.status_code == 401
+
+    def test_profile_admin_get_info_disabled(self):
+        request = self.adminClient.get('/api/v1/profile/3/')
+        assert request.status_code == 200
 
     def test_profile_patch_info(self):
         data = {
@@ -73,3 +86,21 @@ class ProfileTestCase(TestCase):
         profile = Profile.objects.get(user=self.user)
         assert profile.bio == 'test2bio'
         assert profile.address == 'test2address'
+
+    def test_delete_profile(self):
+        request = self.client.delete('/api/v1/profile/')
+
+        assert request.status_code == 200
+        assert User.objects.get(username='testUser2').is_active == 0
+
+    def test_admin_delete_other_profile(self):
+        request = self.adminClient.delete('/api/v1/profile/1/')
+
+        assert request.status_code == 200
+        assert User.objects.get(username='testUser2').is_active == 0
+
+    def test_no_admin_delete_other_profile(self):
+        request = self.client.delete('/api/v1/profile/2/')
+
+        assert request.status_code == 401
+        assert User.objects.get(username='testUser2').is_active == 1
