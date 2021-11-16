@@ -2,6 +2,8 @@ import ntpath
 
 from django.core.files import File
 
+from .forms import ImageForm
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -131,21 +133,21 @@ class ImagesView(APIView):
 
     def post(self, request):
         """
-        Post an image for a certain product
+        Post images for a certain product
         """
-        file = request.GET.get('image')
+
         prod_id = request.GET.get('id')
-        if not file or not prod_id:
+        images = request.FILES.getlist('image')
+        if len(images) == 0 or not prod_id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            product = Product.objects.get(id=prod_id)
-        except Product.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            product_image = Image.objects.create(product=product)
-            product_image.image.save(ntpath.basename(file), File(open(file, 'rb')))
+            form = ImageForm(request.POST, request.FILES)
+            if form.is_valid():
+                product_image = form.save(commit=False)
+                product_image.product = Product.objects.get(id=prod_id)
+                product_image.save()
         except:
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
+
         return Response(status=status.HTTP_201_CREATED)
