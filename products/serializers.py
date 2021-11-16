@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from favorites.models import Favorites
 from products.models import Category, Product, Image
 
 
@@ -17,16 +18,30 @@ class ProductDataSerializer(serializers.ModelSerializer):
     category_description = serializers.CharField(source='category.get_name_display')
     thumbnail = serializers.SerializerMethodField("get_thumbnail")
     seller = ProductSellerSerializer()
+    favorites_count = serializers.SerializerMethodField('get_favorites_count')
+    favorites = serializers.SerializerMethodField('get_favs')
+
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description']
+        fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description',
+                  'favorites_count', 'favorites']
 
     def get_thumbnail(self, obj):
         images = Image.objects.filter(product=obj)
         if len(images) > 0:
             return images.first().image.url
         return None
+
+    def get_favorites_count(self, obj):
+        fav_list = Favorites.objects.filter(product=obj)
+        count = fav_list.count()
+        return count
+
+    def get_favs(self, obj):
+        fav_list = Favorites.objects.filter(product=obj)
+        return fav_list.values_list('user__username', flat=True)
+
 
 class CategoryDataSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=2)
