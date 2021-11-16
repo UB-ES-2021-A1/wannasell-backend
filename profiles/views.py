@@ -41,8 +41,11 @@ class ProfileView(APIView):
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            serializer = ProfileDetailsSerializer(profile)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if user.is_active or request.user.has_perm('profiles.see_disabled_profiles'):
+                serializer = ProfileDetailsSerializer(profile)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
     def put(self, request):
         username = request.GET.get('username')
@@ -95,6 +98,15 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        try:
+            user = request.user
+            user.is_active = False
+            user.save()
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_200_OK)
+
 
 class ProfileIdView(APIView):
     """
@@ -112,9 +124,32 @@ class ProfileIdView(APIView):
 
     def get(self, request, id=None):
         try:
+            user = User.objects.get(id=id)
             profile = Profile.objects.get(id=id)
         except profiles.models.Profile.DoesNotExist:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if profile:
-            serialized_profile = ProfileDetailsSerializer(instance=profile)
-            return Response(serialized_profile.data, status=status.HTTP_200_OK)
+        if profile and user:
+            if user.is_active or request.user.has_perm('profiles.see_disabled_profiles'):
+                serialized_profile = ProfileDetailsSerializer(instance=profile)
+                return Response(serialized_profile.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+    def delete(self, request, id=None):
+        if id:
+            if request.user.has_perm('profiles.modify_other_profiles'):
+                try:
+                    user = User.objects.get(id=id)
+                    user.is_active = False
+                    user.save()
+                except:
+                    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            user = request.user
+            user.is_active = False
+            user.save()
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_200_OK)
