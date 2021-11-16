@@ -26,30 +26,42 @@ class FavoritesTestCase(TestCase):
 
     def test_add_fav(self):
         request = self.client.post('/api/v1/favorites/{0}/'.format(self.p.id), format='json')
-        self.assertEqual(request.status_code, 200)
+        assert request.status_code == 200
+        assert len(Favorites.objects.filter(user=self.u)) == 1
+        assert len(Favorites.objects.filter(product=self.p)) == 1
 
     def test_add_fav_already_added(self):
         f = Favorites.objects.create(user=self.u, product=self.p)
         request = self.client.post('/api/v1/favorites/{0}/'.format(self.p.id), format='json')
-        self.assertEqual(request.status_code, 418)
+        assert request.status_code == 418
+        assert request.data == 'Already exists'
 
     def test_add_fav_without_id(self):
         request = self.client.post('/api/v1/favorites/', format='json')
-        self.assertEqual(request.status_code, 404)
+        assert request.status_code == 404
+        assert len(Favorites.objects.filter(user=self.u)) == 0
+        assert len(Favorites.objects.filter(product=self.p)) == 0
 
     def test_add_fav_unexistent_product(self):
         request = self.client.post('/api/v1/favorites/1234567/', format='json')
-        self.assertEqual(request.status_code, 404)
+        assert request.status_code == 404
+        assert len(Favorites.objects.filter(user=self.u)) == 0
+        assert len(Favorites.objects.filter(product=self.p)) == 0
 
     def test_delete_fav(self):
         request = self.client.delete('/api/v1/favorites/{0}/'.format(self.p.id), format='json')
-        self.assertEqual(request.status_code, 200)
-
+        assert request.status_code == 200
+        assert len(Favorites.objects.filter(user=self.u)) == 0
+        assert len(Favorites.objects.filter(product=self.p)) == 0
 
     def test_delete_fav_unexistent_product(self):
         request = self.client.delete('/api/v1/favorites/12345678/', format='json')
-        self.assertEqual(request.status_code, 404)
+        assert request.status_code == 404
+        assert len(Favorites.objects.filter(user=self.u)) == 0
+        assert len(Favorites.objects.filter(product=self.p)) == 0
 
     def test_delete_fav_no_id(self):
         request = self.client.delete('/api/v1/favorites/', format='json')
-        self.assertEqual(request.status_code, 404)
+        assert request.status_code == 404
+        assert len(Favorites.objects.filter(user=self.u)) == 0
+        assert len(Favorites.objects.filter(product=self.p)) == 0
