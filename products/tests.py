@@ -33,7 +33,7 @@ class ProductsTestCase(TestCase):
 
     def test_get_products_by_category_fail(self):
         request = self.client.get("/api/v1/products/?category=MA", format='json')
-        self.assertEqual(request.status_code, 500)
+        self.assertEqual(request.status_code, 204)
 
     def test_get_products_by_category_success(self):
         p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
@@ -126,3 +126,52 @@ class ProductsTestCase(TestCase):
 
         # Assert
         self.assertEqual(request.status_code, 400)
+
+    def test_search_product_by_name(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+        url = "/api/v1/products/?search=Title"
+
+        # Act
+        request = self.client.get(url)
+        assert request.data[0]['title'] == 'Title'
+
+    def test_search_product_by_category(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+        url = "/api/v1/products/?category=" + self.c.name
+
+        # Act
+        request = self.client.get(url)
+        assert request.data[0]['title'] == 'Title'
+        assert len(request.data) == 2
+
+    def test_search_product_by_title_and_category(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+        url = "/api/v1/products/?category=" + self.c.name + "&search=Title"
+
+        # Act
+        request = self.client.get(url)
+        assert request.data[0]['title'] == 'Title'
+        assert len(request.data) == 1
+
+    def test_search_products_by_username(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+        url = "/api/v1/products/?username=testUser2"
+
+        # Act
+        request = self.client.get(url)
+        print(request.data)
+        assert request.data[0]['title'] == 'Title'
+        assert len(request.data) == 2
+
