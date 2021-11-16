@@ -30,9 +30,8 @@ class ProfileTestCase(TestCase):
 
     def test_profile_get_info(self):
         request = self.client.get('/api/v1/profile/')
-        data = ProfileDetailsSerializer(request.data).data
-        assert data.get('bio') == 'Test Bio'
-        assert data.get('address') == 'Test Address'
+        assert request.data.get('bio') == 'Test Bio'
+        assert request.data.get('address') == 'Test Address'
 
     def test_profile_patch_info(self):
         data = {
