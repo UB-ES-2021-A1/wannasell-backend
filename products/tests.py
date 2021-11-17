@@ -58,6 +58,9 @@ class ProductsTestCase(TestCase):
             'category_name': 'MO'
         }
         request = self.client.post("/api/v1/products/", data)
+        pord = Product.objects.filter(seller=self.u).first()
+        assert request.status_code == 200
+        assert request.data['id'] == pord.id
         self.assertEqual(request.status_code, 200)
 
     def test_get_product_by_id(self):
@@ -171,7 +174,6 @@ class ProductsTestCase(TestCase):
 
         # Act
         request = self.client.get(url)
-        print(request.data)
         assert request.data[0]['title'] == 'Title'
         assert len(request.data) == 2
 
@@ -185,7 +187,6 @@ class ProductsTestCase(TestCase):
 
         # Act
         request = self.client.get(url)
-        print(request.data)
         assert request.data[0]['title'] == 'Title'
         assert len(request.data) == 2
 

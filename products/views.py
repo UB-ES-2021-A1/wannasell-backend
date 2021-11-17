@@ -67,7 +67,7 @@ class ProductsView(APIView):
         try:
             category = Category.objects.get(name=request.POST.get('category_name'))
 
-            Product.objects.create(
+            p = Product.objects.create(
                 title=request.POST.get('title'),
                 description=request.POST.get('description'),
                 price=request.POST.get('price'),
@@ -76,7 +76,7 @@ class ProductsView(APIView):
             )
         except:
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
-        return Response(status=status.HTTP_200_OK)
+        return Response({'id': p.id}, status=status.HTTP_200_OK)
 
 
 class ProductIdView(APIView):
