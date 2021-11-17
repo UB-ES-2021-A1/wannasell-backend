@@ -175,3 +175,17 @@ class ProductsTestCase(TestCase):
         assert request.data[0]['title'] == 'Title'
         assert len(request.data) == 2
 
+    def test_search_empty_strings(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+
+        url = "/api/v1/products/?category=&search="
+
+        # Act
+        request = self.client.get(url)
+        print(request.data)
+        assert request.data[0]['title'] == 'Title'
+        assert len(request.data) == 2
+

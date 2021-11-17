@@ -45,13 +45,13 @@ class ProductsView(APIView):
             seller = request.GET.get('seller')
             qs = []
 
-            if category is not None:
+            if category is not None and category is not '':
                 qs.append(Q(category__name=category))
-            if search is not None:
+            if search is not None and search is not '':
                 qs.append(Q(title__icontains=search))
-            if id is not None:
+            if id is not None and id is not "":
                 qs.append(Q(id=id))
-            if seller is not None:
+            if seller is not None and seller is not "":
                 qs.append(Q(seller__username=seller))
 
             products = Product.objects.filter(reduce(operator.and_, qs)) if len(qs) > 0 else Product.objects.all()
