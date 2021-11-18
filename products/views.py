@@ -65,15 +65,17 @@ class ProductsView(APIView):
 
     def post(self, request):
         try:
-            category = Category.objects.get(name=request.POST.get('category_name'))
+            category = Category.objects.get(name=request.data.get('category_name'))
 
             p = Product.objects.create(
-                title=request.POST.get('title'),
-                description=request.POST.get('description'),
-                price=request.POST.get('price'),
+                title=request.data.get('title'),
+                description=request.data.get('description'),
+                price=request.data.get('price'),
                 seller=request.user,
                 category=category
             )
+
+            p.save()
         except:
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
         return Response({'id': p.id}, status=status.HTTP_200_OK)
