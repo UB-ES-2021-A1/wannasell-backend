@@ -74,6 +74,8 @@ class ProductsView(APIView):
                 seller=request.user,
                 category=category
             )
+
+            p.save()
         except:
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
         return Response({'id': p.id}, status=status.HTTP_200_OK)
