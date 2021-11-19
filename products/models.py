@@ -55,7 +55,7 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.TextField(max_length=500, blank=False)
     description = models.TextField(max_length=1000, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
