@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
+from decimal import Decimal as d
 
 # Create your models here.
 
@@ -61,6 +62,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(price__gte='0'), name='price_gte_0'),
+        ]
 
 
 class Image (models.Model):
