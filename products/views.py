@@ -67,6 +67,10 @@ class ProductsView(APIView):
         try:
             category = Category.objects.get(name=request.data.get('category_name'))
 
+        except:
+            return Response("Couldn't find category", status=status.HTTP_404_NOT_FOUND)
+
+        try:
             p = Product.objects.create(
                 title=request.data.get('title'),
                 description=request.data.get('description'),
@@ -77,7 +81,7 @@ class ProductsView(APIView):
 
             p.save()
         except:
-            return Response(status=status.HTTP_418_IM_A_TEAPOT)
+            return Response("Couldn't create product ", status=status.HTTP_418_IM_A_TEAPOT)
         return Response({'id': p.id}, status=status.HTTP_200_OK)
 
 
