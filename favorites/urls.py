@@ -5,6 +5,5 @@ from favorites.views import FavoritesView, FavoritesByUserView
 # URLConf
 urlpatterns = [
     path('', FavoritesView.as_view()),
-    url(r'^(?P<id>\d+)/$', FavoritesView.as_view()),
-    url(r'myfavorites/', FavoritesByUserView.as_view())
+    url(r'^(?P<id>\d+)/$', FavoritesView.as_view())
 ]
