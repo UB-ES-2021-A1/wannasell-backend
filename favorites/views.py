@@ -56,3 +56,27 @@ class FavoritesView(APIView):
 
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class FavoritesByUserView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request):
+        try:
+            favs = Favorites.objects.filter(user=request.user)
+        except:
+            return Response("Couldn't retrieve favorites", status=status.HTTP_404_NOT_FOUND)
+
+        prod_list = favs.values_list('product__id', flat=True)
+        serialized_lst = []
+        try:
+            serialized_lst = [ProductDataSerializer(Product.objects.get(id=prod_id)).data for prod_id in prod_list]
+        except:
+            return Response("Couldn't retrieve product", status=status.HTTP_404_NOT_FOUND)
+
+        response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
+        print(request.auth)
+        return Response(serialized_lst, status=response_status)
+
+
