@@ -10,9 +10,7 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 
 from favorites.models import Favorites
-from favorites.serializers import FavDataSerializer
 from products.models import Product
-from django.contrib.auth.models import User
 
 
 # Create your views here.

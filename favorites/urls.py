@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from favorites.views import FavoritesView, FavoritesByUserView
+from favorites.views import FavoritesView
 
 # URLConf
 urlpatterns = [
