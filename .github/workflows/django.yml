@@ -21,9 +21,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Run Tests and Upload Report
-      uses: codecov/codecov-action@v2
+    - name: Run Tests
       run: |
         coverage run manage.py test
+    - name: Upload Code Coverage Report
+      uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
