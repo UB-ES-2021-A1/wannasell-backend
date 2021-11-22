@@ -8,8 +8,10 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+[![Build][build-shield]][build-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Issues][issues-shield]][issues-url]
+[![codecov][codecov-shield]][codecov-url]
 [![MIT License][license-shield]][license-url]
 
 
@@ -123,11 +125,17 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
+
+[build-shield]: https://img.shields.io/github/workflow/status/UB-ES-2021-A1/wannasell-backend/Django%20CI?style=for-the-badge
+[build-url]: https://github.com/UB-ES-2021-A1/wannasell-backend
+[contributors-shield]: https://img.shields.io/github/contributors/UB-ES-2021-A1/wannasell-backend.svg?style=for-the-badge
 [contributors-url]: https://github.com/UB-ES-2021-A1/wannasell-backend/graphs/contributors
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/UB-ES-2021-A1/wannasell-backend.svg?style=for-the-badge
 [issues-url]: https://github.com/UB-ES-2021-A1/wannasell-backend/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/UB-ES-2021-A1/wannasell-backend.svg?style=for-the-badge
 [license-url]: https://github.com/UB-ES-2021-A1/wannasell-backend/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [product-screenshot]: images/screenshot.png
+
+[codecov-shield]: https://img.shields.io/codecov/c/gh/UB-ES-2021-A1/wannasell-backend?style=for-the-badge&token=5FDIRO42G3
+[codecov-url]: https://codecov.io/gh/UB-ES-2021-A1/wannasell-backend/branch/production
+
