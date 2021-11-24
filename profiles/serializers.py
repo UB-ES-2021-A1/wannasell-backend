@@ -10,6 +10,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
     avatar = serializers.ImageField(allow_null=False)
     bio = serializers.CharField(max_length=500, allow_blank=True)
     address = serializers.CharField(max_length=1024, allow_blank=True)
+    location = serializers.CharField(max_length=100, allow_blank=True)
     fav_count = serializers.SerializerMethodField('fav_count')
     favs = serializers.SerializerMethodField('fav_list')
 
@@ -17,6 +18,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
         instance.avatar = validated_data.get('avatar', instance.avatar)
         instance.bio = validated_data.get('bio', instance.bio)
         instance.address = validated_data.get('address', instance.address)
+        instance.location = validated_data.get('location', instance.location)
         instance.save()
         return instance
 

@@ -25,6 +25,7 @@ class ProfileTestCase(TestCase):
         self.profile = Profile.objects.get(user=self.user)
         self.profile.bio = 'Test Bio'
         self.profile.address = 'Test Address'
+        self.profile.location = 'Test Location'
         self.profile.save()
 
         # Add authorization to the requests headers
@@ -37,6 +38,7 @@ class ProfileTestCase(TestCase):
         request = self.client.get('/api/v1/profile/')
         assert request.data.get('bio') == 'Test Bio'
         assert request.data.get('address') == 'Test Address'
+        assert request.data.get('location') == 'Test Location'
 
     def test_profile_get_info_disabled(self):
         request = self.client.get('/api/v1/profile/3/')
@@ -49,7 +51,8 @@ class ProfileTestCase(TestCase):
     def test_profile_patch_info(self):
         data = {
             'bio': 'test2bio',
-            'address': 'test2address'
+            'address': 'test2address',
+            'location': 'test2location'
         }
         request = self.client.patch('/api/v1/profile/', data, format='json')
 
@@ -57,11 +60,13 @@ class ProfileTestCase(TestCase):
         profile = Profile.objects.get(user=self.user)
         assert profile.bio == 'test2bio'
         assert profile.address == 'test2address'
+        assert profile.location == 'test2location'
 
     def test_profile_patch_other_info_no_perms(self):
         data = {
             'bio': 'test2bio',
-            'address': 'test2address'
+            'address': 'test2address',
+            'location': 'test2location'
         }
         request = self.client.patch('/api/v1/profile/?username=testAdmin', data, format='json')
 
@@ -71,11 +76,13 @@ class ProfileTestCase(TestCase):
         profile = Profile.objects.get(user=self.admin_user)
         assert profile.bio != 'test2bio'
         assert profile.address != 'test2address'
+        assert profile.location != 'test2location'
 
     def test_profile_patch_other_info(self):
         data = {
             'bio': 'test2bio',
-            'address': 'test2address'
+            'address': 'test2address',
+            'location': 'test2location'
         }
         request = self.adminClient.patch('/api/v1/profile/?username=testUser2', data, format='json')
 
@@ -85,6 +92,7 @@ class ProfileTestCase(TestCase):
         profile = Profile.objects.get(user=self.user)
         assert profile.bio == 'test2bio'
         assert profile.address == 'test2address'
+        assert profile.location == 'test2location'
 
     def test_delete_profile(self):
         request = self.client.delete('/api/v1/profile/')

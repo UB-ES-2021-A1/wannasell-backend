@@ -14,6 +14,7 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to=user_directory_path, default='images/default/avatar/default.png')
     bio = models.TextField(max_length=500, blank=True)
     address = models.TextField(max_length=1024, blank=True)
+    location = models.TextField(max_length=100, blank=True)
 
     class Meta:
         permissions = (
