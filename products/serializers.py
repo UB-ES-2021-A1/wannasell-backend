@@ -2,17 +2,24 @@ from rest_framework import serializers
 
 from favorites.models import Favorites
 from products.models import Category, Product, Image
+from profiles.models import Profile
 
 
 class ProductSellerSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=100)
     first_name = serializers.CharField(max_length=500)
     products = serializers.SerializerMethodField('get_products')
+    avatar = serializers.SerializerMethodField('get_avatar')
 
     def get_products(self, obj):
         products = Product.objects.filter(seller=obj)
         count = products.count()
         return count
+
+    def get_avatar(self, obj):
+        profile = Profile.objects.get(user=obj)
+        avatar = profile.avatar
+        return avatar.url
 
 class ProductDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
