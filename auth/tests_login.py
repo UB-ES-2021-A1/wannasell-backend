@@ -1,9 +1,6 @@
 from django.test import TestCase
 from rest_framework.authtoken.admin import User
 from rest_framework.test import APIClient
-from django.test.utils import override_settings
-
-from profiles.models import Profile
 
 
 class LoginTest(TestCase):

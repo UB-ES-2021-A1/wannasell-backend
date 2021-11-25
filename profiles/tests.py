@@ -4,7 +4,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from profiles.models import Profile
-from profiles.serializers import ProfileDetailsSerializer
 
 
 # TODO Add avatar testing cases (PUT profile missing)

@@ -1,14 +1,11 @@
-import tempfile
-
+from django.contrib.auth.models import User
 from django.test import TestCase
-import PIL
 from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from products.models import Product, Category
-from django.contrib.auth.models import User
 from favorites.models import Favorites
+from products.models import Product, Category
 
 
 # Create your tests here.

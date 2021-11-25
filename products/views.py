@@ -1,24 +1,17 @@
-import ntpath
 import operator
 from functools import reduce
 
-from django.core.files import File
-from django.db.models import QuerySet, Q
-from django.db.models.sql import AND
-
-from .forms import ImageForm
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import status
-
-import products.models
-from products.serializers import ProductDataSerializer, CategoryDataSerializer, ImageDataSerializer
-
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+import products.models
 from products.models import Product, Category, Image
+from products.serializers import ProductDataSerializer, CategoryDataSerializer, ImageDataSerializer
+from .forms import ImageForm
 
 
 # Create your views here.

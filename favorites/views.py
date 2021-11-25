@@ -1,16 +1,13 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-
-import products.models
-from products.serializers import ProductDataSerializer
-
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+import products.models
 from favorites.models import Favorites
 from products.models import Product
+from products.serializers import ProductDataSerializer
 
 
 # Create your views here.
