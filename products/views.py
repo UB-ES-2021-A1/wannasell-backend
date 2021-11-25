@@ -1,24 +1,17 @@
-import ntpath
 import operator
 from functools import reduce
 
-from django.core.files import File
-from django.db.models import QuerySet, Q
-from django.db.models.sql import AND
-
-from .forms import ImageForm
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import status
-
-import products.models
-from products.serializers import ProductDataSerializer, CategoryDataSerializer, ImageDataSerializer
-
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+import products.models
 from products.models import Product, Category, Image
+from products.serializers import ProductDataSerializer, CategoryDataSerializer, ImageDataSerializer
+from .forms import ImageForm
 
 
 # Create your views here.
@@ -103,11 +96,16 @@ class ProductIdView(APIView):
     def get(self, request, id=None):
         try:
             product = Product.objects.get(id=id)
+            self.registerView(product)
         except products.models.Product.DoesNotExist:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if product:
             serialized_profile = ProductDataSerializer(instance=product)
             return Response(serialized_profile.data, status=status.HTTP_200_OK)
+
+    def registerView(self, product):
+        product.views += 1
+        product.save()
 
 
 class CategoriesView(APIView):
