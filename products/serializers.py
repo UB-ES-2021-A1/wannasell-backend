@@ -7,7 +7,12 @@ from products.models import Category, Product, Image
 class ProductSellerSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=100)
     first_name = serializers.CharField(max_length=500)
+    products = serializers.SerializerMethodField('get_products')
 
+    def get_products(self, obj):
+        products = Product.objects.filter(seller=obj)
+        count = products.count()
+        return count
 
 class ProductDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -21,12 +26,13 @@ class ProductDataSerializer(serializers.ModelSerializer):
     favorites_count = serializers.SerializerMethodField('get_favorites_count')
     favorites = serializers.SerializerMethodField('get_favs')
     views = serializers.IntegerField()
+    created_at = serializers.DateTimeField(format="%d-%b-%Y")
 
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description',
-                  'favorites_count', 'favorites', 'views']
+                  'favorites_count', 'favorites', 'views', 'created_at']
 
     def get_thumbnail(self, obj):
         images = Image.objects.filter(product=obj)
