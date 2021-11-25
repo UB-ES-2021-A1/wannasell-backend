@@ -1,6 +1,7 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
+
 
 # Create your models here.
 
@@ -55,12 +56,19 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.TextField(max_length=500, blank=False)
     description = models.TextField(max_length=1000, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    views = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(price__gte='0'), name='price_gte_0'),
+        ]
 
 
 class Image (models.Model):
