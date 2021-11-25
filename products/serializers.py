@@ -25,8 +25,8 @@ class ProductDataSerializer(serializers.ModelSerializer):
     seller = ProductSellerSerializer()
     favorites_count = serializers.SerializerMethodField('get_favorites_count')
     favorites = serializers.SerializerMethodField('get_favs')
-    views = serializers.IntegerField()
-    created_at = serializers.DateTimeField(format="%d-%b-%Y")
+    views = serializers.IntegerField(read_only=True)
+    created_at = serializers.DateTimeField(format="%d-%b-%Y", read_only=True)
 
 
     class Meta:
