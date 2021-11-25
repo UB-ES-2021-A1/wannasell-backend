@@ -96,11 +96,16 @@ class ProductIdView(APIView):
     def get(self, request, id=None):
         try:
             product = Product.objects.get(id=id)
+            self.registerView(product)
         except products.models.Product.DoesNotExist:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if product:
             serialized_profile = ProductDataSerializer(instance=product)
             return Response(serialized_profile.data, status=status.HTTP_200_OK)
+
+    def registerView(self, product):
+        product.views += 1
+        product.save()
 
 
 class CategoriesView(APIView):

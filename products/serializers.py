@@ -20,12 +20,13 @@ class ProductDataSerializer(serializers.ModelSerializer):
     seller = ProductSellerSerializer()
     favorites_count = serializers.SerializerMethodField('get_favorites_count')
     favorites = serializers.SerializerMethodField('get_favs')
+    views = serializers.IntegerField()
 
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description',
-                  'favorites_count', 'favorites']
+                  'favorites_count', 'favorites', 'views']
 
     def get_thumbnail(self, obj):
         images = Image.objects.filter(product=obj)
