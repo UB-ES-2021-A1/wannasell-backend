@@ -19,6 +19,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
     favs = serializers.SerializerMethodField('fav_list')
     products = serializers.SerializerMethodField('products_count')
     user = UserSerializer()
+    phone = serializers.CharField(max_length=12, allow_blank=True)
 
     def update(self, instance, validated_data):
         instance.avatar = validated_data.get('avatar', instance.avatar)
