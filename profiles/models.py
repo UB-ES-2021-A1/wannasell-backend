@@ -15,6 +15,7 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     address = models.TextField(max_length=1024, blank=True)
     location = models.TextField(max_length=100, blank=True)
+    phone = models.CharField(max_length=12, blank=True)
 
     class Meta:
         permissions = (
