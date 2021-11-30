@@ -8,9 +8,7 @@ from rest_framework.test import APIClient
 
 from products.models import Product, Category, Image
 
-
 # Create your tests here.
-from products.serializers import ImageDataSerializer
 
 
 class ProductsTestCase(TestCase):
@@ -66,6 +64,12 @@ class ProductsTestCase(TestCase):
     def test_get_product_by_id(self):
         Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
         request = self.client.get("/api/v1/products/?id=1", format='json')
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_product_default_sold_false(self):
+        Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        request = self.client.get("/api/v1/products/?id=1", format='json')
+        assert not request.data[0]['sold']
         self.assertEqual(request.status_code, 200)
 
     def test_get_images_of_product(self):
@@ -202,4 +206,3 @@ class ProductsTestCase(TestCase):
         request = self.client.get(url)
         assert request.data['title'] == 'Title'
         assert request.data['description'] == 'Description'
-
