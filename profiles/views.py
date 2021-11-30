@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,6 +9,9 @@ import profiles
 from profiles.models import Profile
 from profiles.serializers import ProfileDetailsSerializer
 
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
 
 class ProfileView(APIView):
     """
@@ -23,7 +26,7 @@ class ProfileView(APIView):
     """
 
     serializer_class = ProfileDetailsSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated | ReadOnly]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
