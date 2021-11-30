@@ -18,7 +18,7 @@ class ProductDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=500, allow_blank=False)
     description = serializers.CharField(max_length=1000, allow_blank=True)
-    price = serializers.DecimalField(max_digits=6, decimal_places=2)
+    price = serializers.DecimalField(max_digits=7, decimal_places=2)
     category_name = serializers.CharField(source='category.name')
     category_description = serializers.CharField(source='category.get_name_display')
     thumbnail = serializers.SerializerMethodField("get_thumbnail")
