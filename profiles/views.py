@@ -49,7 +49,7 @@ class ProfileView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
+    ''' DISABLED AS IT'S UNUSED
     def put(self, request):
         username = request.GET.get('username')
 
@@ -75,6 +75,7 @@ class ProfileView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    '''
 
     def patch(self, request):
         username = request.GET.get('username')
@@ -129,7 +130,7 @@ class ProfileIdView(APIView):
         try:
             user = User.objects.get(id=id)
             profile = Profile.objects.get(id=id)
-        except profiles.models.Profile.DoesNotExist:
+        except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if profile and user:
             if user.is_active or request.user.has_perm('profiles.see_disabled_profiles'):

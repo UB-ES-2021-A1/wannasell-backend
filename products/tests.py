@@ -190,3 +190,16 @@ class ProductsTestCase(TestCase):
         assert request.data[0]['title'] == 'Title'
         assert len(request.data) == 2
 
+    def test_get_product_by_id(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+        p2.save()
+
+        url = "/api/v1/products/1/"
+
+        # Act
+        request = self.client.get(url)
+        assert request.data['title'] == 'Title'
+        assert request.data['description'] == 'Description'
+
