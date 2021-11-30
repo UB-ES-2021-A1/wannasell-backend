@@ -15,11 +15,10 @@ class ProfileDetailsSerializer(serializers.Serializer):
     bio = serializers.CharField(max_length=500, allow_blank=True)
     address = serializers.CharField(max_length=1024, allow_blank=True)
     location = serializers.CharField(max_length=100, allow_blank=True)
-    fav_count = serializers.SerializerMethodField('fav_count')
+    fav_count = serializers.SerializerMethodField('favs_count')
     favs = serializers.SerializerMethodField('fav_list')
     products = serializers.SerializerMethodField('products_count')
     user = UserSerializer()
-    phone = serializers.CharField(max_length=12, allow_blank=True)
 
     def update(self, instance, validated_data):
         instance.avatar = validated_data.get('avatar', instance.avatar)
@@ -29,7 +28,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-    def fav_count(self, obj):
+    def favs_count(self, obj):
         fav_list = Favorites.objects.filter(user=obj.user)
         count = fav_list.count()
         return count

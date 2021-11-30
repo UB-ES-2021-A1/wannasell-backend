@@ -3,6 +3,7 @@ from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+import profiles.models
 from profiles.models import Profile
 
 
@@ -110,3 +111,60 @@ class ProfileTestCase(TestCase):
 
         assert request.status_code == 401
         assert User.objects.get(username='testUser2').is_active == 1
+
+    def test_profile__str__(self):
+        user = Profile.objects.get(user__username='testUser2')
+        assert str(user) == 'testUser2'
+
+    def test_get_user_directory_path(self):
+        profile = Profile.objects.get(user__username='testUser2')
+        path = profiles.models.user_directory_path(profile, 'test')
+        assert path == 'images/avatars/1/test'
+
+    def test_get_username_param(self):
+        request = self.client.get('/api/v1/profile/?username=testUser2')
+        assert request.data.get('bio') == 'Test Bio'
+        assert request.data.get('address') == 'Test Address'
+        assert request.data.get('location') == 'Test Location'
+
+    def test_get_username_param_exc(self):
+        request = self.client.get('/api/v1/profile/?username=testUser3')
+        assert request.status_code == 500
+
+    def test_user_get_disabled_username(self):
+        profile = Profile.objects.get(user__username='testUser2')
+        user = User.objects.get(username='testUser2')
+        user.is_active = 0
+        user.save()
+        request = self.client.get('/api/v1/profile/?username=testUser2')
+        assert request.status_code == 401
+
+    def test_admin_get_disabled_username(self):
+        profile = Profile.objects.get(user__username='testUser2')
+        user = User.objects.get(username='testUser2')
+        user.is_active = 0
+        user.save()
+        request = self.adminClient.get('/api/v1/profile/?username=testUser2')
+        assert request.status_code == 200
+
+    def test_admin_patch_wrong_user(self):
+        request = self.adminClient.patch('/api/v1/profile/?username=testUser3')
+        assert request.status_code == 500
+
+    def test_admin_patch_bad_req(self):
+        data = {
+            'location': 'testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
+        }
+        request = self.adminClient.patch('/api/v1/profile/?juan=testUser2', data)
+        assert request.status_code == 400
+
+    def test_profile_no_exists(self):
+        request = self.adminClient.get('/api/v1/profile/4/')
+        assert request.status_code == 500
+
+    def test_self_delete(self):
+        print(User.objects.get(id=1).username)
+        request = self.client.delete('/api/v1/profile/')
+        assert request.status_code == 200
+
+
