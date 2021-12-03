@@ -61,6 +61,46 @@ class ProductsTestCase(TestCase):
         assert request.data['id'] == pord.id
         self.assertEqual(request.status_code, 200)
 
+    def test_patch_product(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+
+        data = {
+            'title': 'New title',
+            'description': 'New description',
+            'price': 2,
+            'user': self.u,
+            'category_name': 'CO'
+        }
+
+        prod_id = (Product.objects.get(title='Title')).id
+        url = "/api/v1/products/?id=" + str(prod_id)
+        request = self.client.patch(url, data)
+        prod = Product.objects.filter(seller=self.u).first()
+
+        assert request.data['title'] == prod.title
+        assert request.data['description'] == prod.description
+        assert request.data['price'] == str(prod.price)
+        assert request.data['category_name'] == prod.category.name
+        self.assertEqual(request.status_code, 200)
+
+    def test_patch_product_not_found(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+
+        data = {
+            'title': 'New title',
+            'description': 'New description',
+            'price': 2,
+            'user': self.u,
+            'category_name': 'CO'
+        }
+
+        url = "/api/v1/products/?id=3"
+        request = self.client.patch(url, data)
+
+        self.assertEqual(request.status_code, 404)
+
     def test_get_product_by_id(self):
         Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
         request = self.client.get("/api/v1/products/?id=1", format='json')

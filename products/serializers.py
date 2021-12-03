@@ -38,6 +38,13 @@ class ProductDataSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%d-%b-%Y", read_only=True)
     sold = serializers.BooleanField()
 
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.category_name = validated_data.get('category_name', instance.category.name)
+        instance.save()
+        return instance
 
     class Meta:
         model = Product

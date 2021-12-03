@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'favorites',
-    'contact'
+    'contact',
+    'reviews'
 ]
 
 MIDDLEWARE = [
