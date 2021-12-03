@@ -77,6 +77,20 @@ class ProductsView(APIView):
             return Response("Couldn't create product ", status=status.HTTP_418_IM_A_TEAPOT)
         return Response({'id': p.id}, status=status.HTTP_200_OK)
 
+    def patch(self, request):
+        id = request.query_params['id'][0]
+        try:
+            product = Product.objects.get(id=id)
+        except products.models.Product.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serialized_product = ProductDataSerializer(instance=product, data=request.data, partial=True)
+
+        if serialized_product.is_valid():
+            serialized_product.save()
+            return Response(serialized_product.data, status=status.HTTP_200_OK)
+        return Response(serialized_product.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProductIdView(APIView):
     """
