@@ -174,3 +174,31 @@ class ImagesView(APIView):
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
 
         return Response(status=status.HTTP_201_CREATED)
+
+class ProductSoldView(APIView):
+    serializer_class = ProductDataSerializer
+
+    permission_classes = [IsAuthenticated | ReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request):
+        try:
+            seller = request.GET.get('seller')
+            sold = request.GET.get('sold')
+
+            qs = [Q(sold=sold)]
+            if seller is not None and seller != "":
+                qs.append(Q(seller__username=seller))
+
+            if len(qs)<2 or sold is None or sold == "":
+                return Response("Not enough arguments", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                products = Product.objects.filter(reduce(operator.and_, qs))
+                products_serialized = [ProductDataSerializer(prod).data for prod in products]
+                response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
+                return Response(products_serialized, status=response_status)
+
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

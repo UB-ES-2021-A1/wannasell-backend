@@ -246,3 +246,55 @@ class ProductsTestCase(TestCase):
         request = self.client.get(url)
         assert request.data['title'] == 'Title'
         assert request.data['description'] == 'Description'
+
+    def test_get_sold_products_no_products(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+
+        url = "/api/v1/products/sold/?sold=True&seller=" + self.u.username
+        request = self.client.get(url)
+        assert request.data == []
+        assert request.status_code == 204
+
+    def test_get_sold_products(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.sold = True
+        p.save()
+        p2.save()
+        url = "/api/v1/products/sold/?sold=True&seller=" + self.u.username
+        request = self.client.get(url)
+        assert request.data[0]['title'] == 'Title'
+        assert request.status_code == 200
+
+    def test_get_unsold_products_no_products(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.sold = True
+        p.save()
+        url = "/api/v1/products/sold/?sold=False&seller=" + self.u.username
+        request = self.client.get(url)
+        assert request.data == []
+        assert request.status_code == 204
+
+    def test_get_unsold_products(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
+        p.sold = True
+        p.save()
+        p2.save()
+        url = "/api/v1/products/sold/?sold=False&seller=" + self.u.username
+        request = self.client.get(url)
+        assert request.data[0]['title'] == 'Pepe'
+        assert request.status_code == 200
+
+    def test_get_sold_products_not_enough_args1(self):
+        url = "/api/v1/products/sold/?sold=False"
+        request = self.client.get(url)
+        assert request.data == "Not enough arguments"
+        assert request.status_code == 400
+
+    def test_get_sold_products_not_enough_args2(self):
+        url = "/api/v1/products/sold/?seller=" + self.u.username
+        request = self.client.get(url)
+        assert request.data == "Not enough arguments"
+        assert request.status_code == 400
