@@ -76,8 +76,9 @@ class CategoryDataSerializer(serializers.ModelSerializer):
 
 
 class ImageDataSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     image = serializers.ImageField(allow_null=False)
 
     class Meta:
         model = Image
-        fields = ['image']
+        fields = ['id', 'image']

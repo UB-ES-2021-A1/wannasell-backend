@@ -126,6 +126,8 @@ class ProductsTestCase(TestCase):
         # Assert
         images = request.data
         assert len(images) == 2
+        assert 'id' in images[0]
+        assert 'image' in images[0]
         self.assertEqual(request.status_code, 200)
 
     def test_post_product_image_form(self):
