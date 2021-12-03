@@ -174,3 +174,15 @@ class ImagesView(APIView):
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
 
         return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        """
+        Delete an image
+        """
+        id = request.GET.get('id')
+        try:
+            image = Image.objects.get(id=id)
+            image.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
