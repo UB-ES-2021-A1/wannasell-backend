@@ -246,3 +246,38 @@ class ProductsTestCase(TestCase):
         request = self.client.get(url)
         assert request.data['title'] == 'Title'
         assert request.data['description'] == 'Description'
+
+    def test_delete_product_image(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+
+        image = PIL.Image.new('RGB', (100, 100))
+        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+        image.save(tmp_file)
+        tmp_file.seek(0)
+
+        url = "/api/v1/products/images/?id=" + str(p.id)
+        self.client.post(url, {'image': tmp_file}, format="multipart")
+
+        prod_image = Image.objects.filter(product=p).first()
+        url = "/api/v1/products/images/?id=" + str(prod_image.id)
+
+        # Act
+        request = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 200)
+
+    def test_delete_product_image_not_found(self):
+        # Arrange
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
+        p.save()
+
+        url = "/api/v1/products/images/?id=10"
+
+        # Act
+        request = self.client.delete(url)
+
+        # Assert
+        self.assertEqual(request.status_code, 404)
