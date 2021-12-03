@@ -7,6 +7,7 @@ class Review(models.Model):
     message = models.TextField()
     val = models.IntegerField()
     check = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
