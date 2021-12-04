@@ -30,7 +30,7 @@ class ReviewsView(APIView):
     """
     GET: "api/v1/reviews/?seller=username" Returns the reviews done on that user
     POST: "api/v1/reviews/?seller=username" + {"message": "text", "val": n} Adds a review on that user
-    PATCH: "api/v1/reviews/?seller=username1&seller=username2" +  {"message": "text", "val": n, "check": False} Modifies
+    PATCH: "api/v1/reviews/?seller=username1" +  {"message": "text", "val": n, "check": False} Modifies
             the review done on username1 by username2, pls set the check to False in the dict so the admin has to check the
             modification
     """
@@ -79,10 +79,9 @@ class ReviewsView(APIView):
 
     def patch(self, request):
         seller = request.query_params['seller']
-        buyer = request.query_params['buyer']
+        b = request.user
         try:
             s = User.objects.get(username=seller)
-            b = User.objects.get(username=buyer)
         except:
             return Response('Buyer or Seller not found', status=status.HTTP_404_NOT_FOUND)
 

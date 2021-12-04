@@ -27,7 +27,7 @@ class ReviewTestCase(TestCase):
             'val': 4,
             'check': False
         }
-        url = "/api/v1/reviews/?seller=" + self.seller.username + "&buyer=" + self.buyer.username
+        url = "/api/v1/reviews/?seller=" + self.seller.username
         request = self.client.patch(url, data)
         rev = Review.objects.get(reviewer=self.buyer, seller=self.seller)
 
@@ -43,7 +43,7 @@ class ReviewTestCase(TestCase):
             'val': 4,
             'check': False
         }
-        url = "/api/v1/reviews/?seller=haha&buyer=" + self.buyer.username
+        url = "/api/v1/reviews/?seller=haha"
         request = self.client.patch(url, data)
 
         assert request.data == 'Buyer or Seller not found'
@@ -55,7 +55,7 @@ class ReviewTestCase(TestCase):
             'val': 4,
             'check': False
         }
-        url = "/api/v1/reviews/?seller=" + self.seller.username + "&buyer=" + self.buyer.username
+        url = "/api/v1/reviews/?seller=" + self.seller.username
         request = self.client.patch(url, data)
 
         assert request.data == 'Review not found'
@@ -67,7 +67,7 @@ class ReviewTestCase(TestCase):
         data = {
             'val': 'casi crack'
         }
-        url = "/api/v1/reviews/?seller=" + self.seller.username + "&buyer=" + self.buyer.username
+        url = "/api/v1/reviews/?seller=" + self.seller.username
         request = self.client.patch(url, data)
         assert request.data == 'Bad Request :('
         assert request.status_code == 400
