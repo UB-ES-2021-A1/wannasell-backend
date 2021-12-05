@@ -36,7 +36,7 @@ class ProductsView(APIView):
             id = request.GET.get('id')
             search = request.GET.get('search')
             seller = request.GET.get('seller')
-            qs = []
+            qs = [Q(sold=False)]
 
             if category is not None and category != '':
                 qs.append(Q(category__name=category))
@@ -47,7 +47,7 @@ class ProductsView(APIView):
             if seller is not None and seller != "":
                 qs.append(Q(seller__username=seller))
 
-            products = Product.objects.filter(reduce(operator.and_, qs)) if len(qs) > 0 else Product.objects.all()
+            products = Product.objects.filter(reduce(operator.and_, qs))
 
             products_serialized = [ProductDataSerializer(prod).data for prod in products]
             response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
@@ -202,7 +202,7 @@ class ProductSoldView(APIView):
             if seller is not None and seller != "":
                 qs.append(Q(seller__username=seller))
 
-            if len(qs)<2 or sold is None or sold == "":
+            if len(qs) < 2 or sold is None or sold == "":
                 return Response("Not enough arguments", status=status.HTTP_400_BAD_REQUEST)
             else:
                 products = Product.objects.filter(reduce(operator.and_, qs))
