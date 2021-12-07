@@ -18,7 +18,6 @@ class ProfileTestCase(TestCase):
     def setUp(self):
         # Create User and Auth Token
         self.user = User.objects.create_user('testUser2', 'lennon@thebeatles.com', 'johnpassword')
-        self.user2 = User.objects.create_user('testUser3', 'lennon3@thebeatles.com', 'johnpassword')
         self.admin_user = User.objects.create_superuser('testAdmin', 'admin@admin.es', 'testAdminPassword')
         self.token = Token.objects.get_or_create(user=self.user)[0].__str__()
         self.adminToken = Token.objects.get_or_create(user=self.admin_user)[0].__str__()
@@ -40,6 +39,8 @@ class ProfileTestCase(TestCase):
         self.adminClient = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         self.adminClient.credentials(HTTP_AUTHORIZATION='Token ' + self.adminToken)
+
+        self.user2 = User.objects.create_user('testUserPepe', 'lennon3@thebeatles.com', 'johnpassword')
 
     def test_profile_get_info(self):
         request = self.client.get('/api/v1/profile/')
@@ -166,7 +167,7 @@ class ProfileTestCase(TestCase):
         assert request.status_code == 400
 
     def test_profile_no_exists(self):
-        request = self.adminClient.get('/api/v1/profile/4/')
+        request = self.adminClient.get('/api/v1/profile/200/')
         assert request.status_code == 500
 
     def test_self_delete(self):
