@@ -1,17 +1,24 @@
+from django.db.models import Q, Avg
 from django.test import TestCase
 from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 import profiles.models
+from favorites.models import Favorites
+from products.models import Product, Category
 from profiles.models import Profile
 
 
 # TODO Add avatar testing cases (PUT profile missing)
+from reviews.models import Review
+
+
 class ProfileTestCase(TestCase):
     def setUp(self):
         # Create User and Auth Token
         self.user = User.objects.create_user('testUser2', 'lennon@thebeatles.com', 'johnpassword')
+        self.user2 = User.objects.create_user('testUser3', 'lennon3@thebeatles.com', 'johnpassword')
         self.admin_user = User.objects.create_superuser('testAdmin', 'admin@admin.es', 'testAdminPassword')
         self.token = Token.objects.get_or_create(user=self.user)[0].__str__()
         self.adminToken = Token.objects.get_or_create(user=self.admin_user)[0].__str__()
@@ -166,5 +173,58 @@ class ProfileTestCase(TestCase):
         print(User.objects.get(id=1).username)
         request = self.client.delete('/api/v1/profile/')
         assert request.status_code == 200
+
+    def test_products_sold(self):
+        cat = Category.objects.create(name='MO', grayscale_image='img.png', green_image='img.png')
+        prod1 = Product.objects.create(price=5, category=cat, seller=self.user)
+        prod2 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod3 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod1.save()
+        prod2.save()
+        prod3.save()
+        request = self.client.get('/api/v1/profile/')
+        assert request.data['n_sold_products'] == 2
+
+    def test_products_selling(self):
+        cat = Category.objects.create(name='MO', grayscale_image='img.png', green_image='img.png')
+        prod1 = Product.objects.create(price=5, category=cat, seller=self.user)
+        prod2 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod3 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod1.save()
+        prod2.save()
+        prod3.save()
+        request = self.client.get('/api/v1/profile/')
+        assert request.data['n_selling_products'] == 1
+
+    def test_products_favorited(self):
+        cat = Category.objects.create(name='MO', grayscale_image='img.png', green_image='img.png')
+        prod1 = Product.objects.create(price=5, category=cat, seller=self.user)
+        prod2 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod3 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        fav1 = Favorites.objects.create(product=prod1, user=self.user)
+        fav2 = Favorites.objects.create(product=prod2, user=self.user)
+        prod1.save()
+        prod2.save()
+        prod3.save()
+        fav1.save()
+        fav2.save()
+        request = self.client.get('/api/v1/profile/')
+        assert request.data['n_favorite_products'] == 2
+
+    def test_user_review_mean(self):
+        cat = Category.objects.create(name='MO', grayscale_image='img.png', green_image='img.png')
+        prod1 = Product.objects.create(price=5, category=cat, seller=self.user)
+        prod2 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        prod3 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
+        review1 = Review.objects.create(reviewer=self.user, seller=self.user, val=3)
+        review2 = Review.objects.create(reviewer=self.user2, seller=self.user, val=4)
+        prod1.save()
+        prod2.save()
+        prod3.save()
+        review1.save()
+        review2.save()
+        request = self.client.get('/api/v1/profile/')
+        assert request.data['review_mean'] == 3.5
+
 
 
