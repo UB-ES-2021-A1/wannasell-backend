@@ -78,7 +78,7 @@ class ProductsView(APIView):
         return Response({'id': p.id}, status=status.HTTP_200_OK)
 
     def patch(self, request):
-        id = request.query_params['id'][0]
+        id = request.query_params['id']
         try:
             product = Product.objects.get(id=id)
         except products.models.Product.DoesNotExist:
