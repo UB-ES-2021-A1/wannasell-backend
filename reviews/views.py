@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 
 import reviews.models
 from reviews.models import Review
-from reviews.serializers import ReviewDataSerializer
+from reviews.serializers import ReviewDataSerializer, ReviewReturnDataSerializer
+
 
 # Create your views here.
 
@@ -49,7 +50,7 @@ class ReviewsView(APIView):
 
             reviews = Review.objects.filter(reduce(operator.and_, qs))
 
-            reviews_serialized = [ReviewDataSerializer(rev).data for rev in reviews]
+            reviews_serialized = [ReviewReturnDataSerializer(rev).data for rev in reviews]
             response_status = status.HTTP_200_OK if reviews else status.HTTP_204_NO_CONTENT
             return Response(reviews_serialized, status=response_status)
         except Exception as e:
