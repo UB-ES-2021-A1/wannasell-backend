@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from profiles.serializers import UserSerializer
 from reviews.models import Review
 
 
@@ -16,3 +17,11 @@ class ReviewDataSerializer(serializers.ModelSerializer):
         instance.check = validated_data.get('check', instance.check)
         instance.save()
         return instance
+
+
+class ReviewReturnDataSerializer(serializers.Serializer):
+    seller = UserSerializer()
+    reviewer = UserSerializer()
+    message = serializers.CharField(max_length=500, allow_blank=True)
+    val = serializers.IntegerField()
+    created_at = serializers.DateTimeField(format="%d-%b-%Y", read_only=True)
