@@ -51,8 +51,8 @@ class ProductsTestCase(TestCase):
     def test_get_contact(self):
         self.test_contact_post()
         request = self.apiClient.get('/api/v1/contact/')
-        assert request.data[0]['buyer'] == self.buyer.id
-        assert request.data[0]['seller'] == self.seller.id
+        assert request.data[0]['buyer']['username'] == self.buyer.username
+        assert request.data[0]['seller']['username'] == self.seller.username
         assert request.data[0]['product']['title'] == self.product.title
 
     def test_delete_contact(self):
