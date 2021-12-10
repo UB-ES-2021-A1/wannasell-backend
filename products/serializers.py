@@ -36,12 +36,20 @@ class ProductDataSerializer(serializers.ModelSerializer):
     favorites = serializers.SerializerMethodField('get_favs')
     views = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(format="%d-%b-%Y", read_only=True)
+    sold = serializers.BooleanField()
 
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.category_name = validated_data.get('category_name', instance.category.name)
+        instance.save()
+        return instance
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description',
-                  'favorites_count', 'favorites', 'views', 'created_at']
+                  'favorites_count', 'favorites', 'views', 'created_at', 'sold']
 
     def get_thumbnail(self, obj):
         images = Image.objects.filter(product=obj)
@@ -68,8 +76,9 @@ class CategoryDataSerializer(serializers.ModelSerializer):
 
 
 class ImageDataSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     image = serializers.ImageField(allow_null=False)
 
     class Meta:
         model = Image
-        fields = ['image']
+        fields = ['id', 'image']
