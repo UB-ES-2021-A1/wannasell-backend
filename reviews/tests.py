@@ -149,3 +149,21 @@ class ReviewTestCase(TestCase):
         request = self.client.get(url)
         assert request.data == 'Seller not provided'
         assert request.status_code == 400
+
+    def test_my_reviews_no_content(self):
+        url = "/api/v1/reviews/myreviews/"
+
+        request = self.client.get(url)
+        assert request.data == []
+        assert request.status_code == 204
+
+    def test_my_reviews(self):
+        url = "/api/v1/reviews/myreviews/"
+
+        r = Review.objects.create(reviewer=self.buyer, seller=self.seller, message='test', val=3)
+        r.check = True
+        r.save()
+
+        request = self.client.get(url)
+        assert request.data[0]['message'] == 'test'
+        assert request.status_code == 200
