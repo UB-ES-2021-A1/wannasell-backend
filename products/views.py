@@ -84,6 +84,7 @@ class ProductsView(APIView):
         except products.models.Product.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        product.category = Category.objects.get(name=request.data.get('category_name'))
         serialized_product = ProductDataSerializer(instance=product, data=request.data, partial=True)
 
         if serialized_product.is_valid():

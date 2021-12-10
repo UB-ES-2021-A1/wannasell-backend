@@ -15,24 +15,55 @@ from profiles.models import Profile
 
 class IntegrationTests(TestCase):
     def setUp(self):
-        # Create client
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
-
         # Create User and Auth Token
         self.u = User.objects.create_user('testUser2', 'lennon@thebeatles.com', 'johnpassword')
         self.token = Token.objects.get_or_create(user=self.u)[0].__str__()
 
+        # Create client
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+
         # Create category and product
         self.c = Category.objects.create(name='MO', grayscale_image='img.png', green_image='img.png')
-        self.p = Product.objects.create(title='Title', description='Description', price=1, seller=us, category=c)
+        self.p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
 
         # Get and define user's profile attributes
-        self.profile = Profile.objects.get(user=self.user)
+        self.profile = Profile.objects.get(user=self.u)
         self.profile.bio = 'Test Bio'
         self.profile.address = 'Test Address'
         self.profile.location = 'Test Location'
         self.profile.save()
+
+    def test_upload_and_modify_product(self):
+
+        data = {
+            'title': 'Moto',
+            'description': 'Una moto',
+            'price': 12,
+            'user': self.u,
+            'category_name': 'MO'
+        }
+        post_request = self.client.post("/api/v1/products/", data)
+
+        assert post_request.status_code == 200
+
+        new_data = {
+            'title': 'New moto',
+            'description': 'New description',
+            'price': 2,
+            'user': self.u,
+            'category_name': 'CO'
+        }
+
+        Category.objects.create(name='CO', grayscale_image='img.png', green_image='img.png')
+        url = "/api/v1/products/?id=" + str(post_request.data['id'])
+        patch_request = self.client.patch(url, new_data)
+
+        assert patch_request.status_code == 200
+        assert patch_request.data['title'] == 'New moto'
+        assert patch_request.data['description'] == 'New description'
+        assert patch_request.data['price'] == '2.00'
+        assert patch_request.data['category_name'] == 'CO'
 
     def test_get_products_succesfull(self):
         p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
