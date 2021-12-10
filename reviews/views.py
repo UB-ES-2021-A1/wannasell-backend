@@ -97,3 +97,27 @@ class ReviewsView(APIView):
             serialized_review.save()
             return Response(serialized_review.data, status=status.HTTP_200_OK)
         return Response('Bad Request :(', status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyReviewsView(APIView):
+    serializer_class = ReviewDataSerializer
+
+    permission_classes = [IsAuthenticated | ReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    """
+    GET: "api/v1/reviews/myreviews/" Returns the reviews done by that user
+    """
+
+    def get(self, request):
+        try:
+            reviewer = request.user.username
+            qs = [Q(check=True), Q(reviewer__username=reviewer)]
+            reviews = Review.objects.filter(reduce(operator.and_, qs))
+
+            reviews_serialized = [ReviewReturnDataSerializer(rev).data for rev in reviews]
+            response_status = status.HTTP_200_OK if reviews else status.HTTP_204_NO_CONTENT
+            return Response(reviews_serialized, status=response_status)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
