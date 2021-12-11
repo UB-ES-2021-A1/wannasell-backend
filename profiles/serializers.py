@@ -17,6 +17,10 @@ class ProfileDetailsSerializer(serializers.Serializer):
     bio = serializers.CharField(max_length=500, allow_blank=True)
     address = serializers.CharField(max_length=1024, allow_blank=True)
     location = serializers.CharField(max_length=100, allow_blank=True)
+    phone = serializers.CharField(max_length=24, allow_blank=True)
+    countryCallingCode = serializers.CharField(max_length=5, allow_blank=True)
+    countryCode = serializers.CharField(max_length=2, allow_blank=True)
+    formatInternational = serializers.SerializerMethodField('get_phone_international')
     fav_count = serializers.SerializerMethodField('favs_count')
     favs = serializers.SerializerMethodField('fav_list')
     products = serializers.SerializerMethodField('products_count')
@@ -32,6 +36,9 @@ class ProfileDetailsSerializer(serializers.Serializer):
         instance.bio = validated_data.get('bio', instance.bio)
         instance.address = validated_data.get('address', instance.address)
         instance.location = validated_data.get('location', instance.location)
+        instance.phone = validated_data.get('phone', instance.location)
+        instance.countryCallingCode = validated_data.get('countryCallingCode', instance.location)
+        instance.countryCode = validated_data.get('countryCode', instance.location)
         instance.save()
         return instance
 
@@ -78,4 +85,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
         reviews = Review.objects.filter(Q(seller=obj.user))
         mean = reviews.aggregate(Avg('val'))['val__avg']
         return mean
+
+    def get_phone_international(self, obj):
+        return obj.countryCallingCode + obj.phone
 
