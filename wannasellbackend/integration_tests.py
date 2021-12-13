@@ -6,6 +6,7 @@ from rest_framework.authtoken.admin import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+from favorites.models import Favorites
 from products.models import Product, Category, Image
 
 
@@ -65,35 +66,26 @@ class IntegrationTests(TestCase):
         assert patch_request.data['price'] == '2.00'
         assert patch_request.data['category_name'] == 'CO'
 
-    def test_get_products_succesfull(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        request = self.client.get('/api/v1/products/', format='json')
-        self.assertEqual(request.status_code, 200)
+    def test_add_and_get_favorite_products(self):
 
-    def test_get_empty_products(self):
-        request = self.client.get('/api/v1/products/', format='json')
-        self.assertEqual(request.status_code, 204)
+        other_user = User.objects.create_user('otherUser', 'lennon@other.com', 'otherpassword')
 
-    def test_get_products_by_category_fail(self):
-        request = self.client.get("/api/v1/products/?category=MA", format='json')
-        self.assertEqual(request.status_code, 204)
+        fav_product = Product.objects.create(title='Other Title', description='Description', price=1, seller=other_user, category=self.c)
+        other_fav_product = Product.objects.create(title='Other Title 2', description='Description 2', price=1, seller=other_user, category=self.c)
 
-    def test_get_products_by_category_success(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        request = self.client.get("/api/v1/products/?category=MO", format='json')
-        self.assertEqual(request.status_code, 200)
+        request_add_fav = self.client.post('/api/v1/favorites/{0}/'.format(fav_product.id), format='json')
+        request_add_fav_2 = self.client.post('/api/v1/favorites/{0}/'.format(other_fav_product.id), format='json')
 
-    def test_get_products_by_category_empty_success(self):
-        request = self.client.get("/api/v1/products/?category=MO", format='json')
-        self.assertEqual(request.status_code, 204)
+        assert request_add_fav.status_code == 200
+        assert request_add_fav_2.status_code == 200
 
-    def test_get_category(self):
-        request = self.client.get("/api/v1/products/categories/")
-        self.assertEqual(request.status_code, 200)
+        request_get_favs = self.client.get('/api/v1/favorites/', format='json')
 
-    def test_post_product(self):
+        assert request_get_favs.status_code == 200
+        assert len(request_get_favs.data) == 2
+
+    def test_publish_and_get_seller_products(self):
+
         data = {
             'title': 'Moto',
             'description': 'Una moto',
@@ -101,149 +93,24 @@ class IntegrationTests(TestCase):
             'user': self.u,
             'category_name': 'MO'
         }
-        request = self.client.post("/api/v1/products/", data)
-        pord = Product.objects.filter(seller=self.u).first()
-        assert request.status_code == 200
-        assert request.data['id'] == pord.id
+        self.client.post("/api/v1/products/", data)
+
+        data = {
+            'title': 'Moto 2',
+            'description': 'Una moto 2',
+            'price': 120,
+            'user': self.u,
+            'category_name': 'MO'
+        }
+
+        self.client.post("/api/v1/products/", data)
+
+        other_user = User.objects.create_user('otherUser', 'lennon@other.com', 'otherpassword')
+        Product.objects.create(title='Other Title', description='Description', price=1, seller=other_user,
+                                         category=self.c)
+
+        request = self.client.get("/api/v1/products/?seller={0}".format(self.u.username), format='json')
+
         self.assertEqual(request.status_code, 200)
-
-    def test_get_product_by_id(self):
-        Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        request = self.client.get("/api/v1/products/?id=1", format='json')
-        self.assertEqual(request.status_code, 200)
-
-    def test_get_images_of_product(self):
-        # Arrange
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        prod_id = (Product.objects.get(title='Title')).id
-        Image.objects.create(product=p, image='fake1')
-        Image.objects.create(product=p, image='fake2')
-
-        # Act
-        request = self.client.get("/api/v1/products/images/?id=" + str(prod_id), format='json')
-
-        # Assert
-        images = request.data
-        assert len(images) == 2
-        self.assertEqual(request.status_code, 200)
-
-    def test_post_product_image_form(self):
-        # Arrange
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        prod_id = (Product.objects.get(title='Title')).id
-        url = "/api/v1/products/images/?id=" + str(prod_id)
-
-        image = PIL.Image.new('RGB', (100, 100))
-        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
-        image.save(tmp_file)
-        tmp_file.seek(0)
-
-        # Act
-        request = self.client.post(url, {'image': tmp_file}, format="multipart")
-
-        # Assert
-        self.assertEqual(request.status_code, 201)
-
-    def test_post_product_image_id_not_provided(self):
-        # Arrange
-        url = "/api/v1/products/images/"
-
-        image = PIL.Image.new('RGB', (100, 100))
-        tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
-        image.save(tmp_file)
-        tmp_file.seek(0)
-
-        # Act
-        request = self.client.post(url, {'image': tmp_file}, format="multipart")
-
-        # Assert
-        self.assertEqual(request.status_code, 400)
-
-    def test_post_product_image_image_not_provided(self):
-        # Arrange
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        prod_id = (Product.objects.get(title='Title')).id
-        url = "/api/v1/products/images/?id=" + str(prod_id)
-
-        # Act
-        request = self.client.post(url, format="multipart")
-
-        # Assert
-        self.assertEqual(request.status_code, 400)
-
-    def test_search_product_by_name(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-        url = "/api/v1/products/?search=Title"
-
-        # Act
-        request = self.client.get(url)
-        assert request.data[0]['title'] == 'Title'
-
-    def test_search_product_by_category(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-        url = "/api/v1/products/?category=" + self.c.name
-
-        # Act
-        request = self.client.get(url)
-        assert request.data[0]['title'] == 'Title'
-        assert len(request.data) == 2
-
-    def test_search_product_by_title_and_category(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-        url = "/api/v1/products/?category=" + self.c.name + "&search=Title"
-
-        # Act
-        request = self.client.get(url)
-        assert request.data[0]['title'] == 'Title'
-        assert len(request.data) == 1
-
-    def test_search_products_by_username(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-        url = "/api/v1/products/?username=testUser2"
-
-        # Act
-        request = self.client.get(url)
-        assert request.data[0]['title'] == 'Title'
-        assert len(request.data) == 2
-
-    def test_search_empty_strings(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-
-        url = "/api/v1/products/?category=&search="
-
-        # Act
-        request = self.client.get(url)
-        assert request.data[0]['title'] == 'Title'
-        assert len(request.data) == 2
-
-    def test_get_product_by_id(self):
-        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
-        p2 = Product.objects.create(title='Pepe', description='Description', price=1, seller=self.u, category=self.c)
-        p.save()
-        p2.save()
-
-        url = "/api/v1/products/1/"
-
-        # Act
-        request = self.client.get(url)
-        assert request.data['title'] == 'Title'
-        assert request.data['description'] == 'Description'
+        assert len(request.data) == 3
 
