@@ -112,7 +112,7 @@ class MyReviewsView(APIView):
     def get(self, request):
         try:
             reviewer = request.user.username
-            qs = [Q(check=True), Q(reviewer__username=reviewer)]
+            qs = [Q(reviewer__username=reviewer)]
             reviews = Review.objects.filter(reduce(operator.and_, qs))
 
             reviews_serialized = [ReviewReturnDataSerializer(rev).data for rev in reviews]
