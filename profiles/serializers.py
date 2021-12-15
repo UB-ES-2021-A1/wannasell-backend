@@ -72,7 +72,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
         return count
 
     def user_reviews_by(self, obj):
-        reviews = Review.objects.filter(Q(reviewer=obj.user))
+        reviews = Review.objects.filter(Q(reviewer=obj.user) & Q(check=True))
         count = reviews.count()
         return count
 

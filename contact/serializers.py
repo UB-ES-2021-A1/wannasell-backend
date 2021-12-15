@@ -10,11 +10,16 @@ class ContactSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=500)
     email = serializers.EmailField()
     phone = serializers.SerializerMethodField('get_phone')
+    internationalPhone = serializers.SerializerMethodField('get_phone_international')
 
     def get_phone(self, obj):
         profile = Profile.objects.get(user=obj)
         number = profile.phone
         return number
+
+    def get_phone_international(self, obj):
+        profile = Profile.objects.get(user=obj)
+        return profile.countryCallingCode + profile.phone
 
 
 class ContactDataSerializer(serializers.ModelSerializer):
