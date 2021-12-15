@@ -13,7 +13,7 @@ class ProductSellerSerializer(serializers.Serializer):
     products = serializers.SerializerMethodField('get_products')
 
     def get_products(self, obj):
-        products = Product.objects.filter(seller=obj)
+        products = Product.objects.filter(seller=obj, sold=False)
         count = products.count()
         return count
 
