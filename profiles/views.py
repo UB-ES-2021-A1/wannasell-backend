@@ -98,7 +98,10 @@ class ProfileView(APIView):
         serializer = ProfileDetailsSerializer(instance=profile, data=request.data, partial=True)
 
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except Exception as e:
+                print(e)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
