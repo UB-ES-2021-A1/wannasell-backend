@@ -9,17 +9,12 @@ class ContactSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=100)
     first_name = serializers.CharField(max_length=500)
     email = serializers.EmailField()
-    phone = serializers.SerializerMethodField('get_phone')
     internationalPhone = serializers.SerializerMethodField('get_phone_international')
-
-    def get_phone(self, obj):
-        profile = Profile.objects.get(user=obj)
-        number = profile.phone
-        return number
 
     def get_phone_international(self, obj):
         profile = Profile.objects.get(user=obj)
-        return profile.countryCallingCode + profile.phone
+        number = profile.internationalNumber
+        return number
 
 
 class ContactDataSerializer(serializers.ModelSerializer):

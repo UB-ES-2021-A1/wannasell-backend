@@ -19,7 +19,7 @@ class ProductSellerSerializer(serializers.Serializer):
 
     def get_sellers_phone(self, obj):
         profile = Profile.objects.get(user=obj)
-        number = profile.phone
+        number = profile.internationalNumber
         return number
 
 
