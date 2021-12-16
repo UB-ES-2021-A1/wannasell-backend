@@ -16,7 +16,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
     avatar = serializers.ImageField(allow_null=False)
     bio = serializers.CharField(max_length=500, allow_blank=True)
     address = serializers.CharField(max_length=1024, allow_blank=True)
-    location = serializers.CharField(max_length=100, allow_blank=True)
+    location = serializers.CharField(max_length=1024, allow_blank=True)
     phone = serializers.CharField(max_length=24, allow_blank=True)
     countryCallingCode = serializers.CharField(max_length=5, allow_blank=True)
     countryCode = serializers.CharField(max_length=2, allow_blank=True)
