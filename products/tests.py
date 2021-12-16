@@ -74,6 +74,8 @@ class ProductsTestCase(TestCase):
             'sold': True
         }
 
+        Category.objects.create(name='CO', grayscale_image='img.png', green_image='img.png')
+
         prod_id = (Product.objects.get(title='Title')).id
         url = "/api/v1/products/?id=" + str(prod_id)
         request = self.client.patch(url, data)
