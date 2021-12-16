@@ -36,10 +36,10 @@ class ProfileDetailsSerializer(serializers.Serializer):
         instance.bio = validated_data.get('bio', instance.bio)
         instance.address = validated_data.get('address', instance.address)
         instance.location = validated_data.get('location', instance.location)
-        instance.phone = validated_data.get('phone', instance.location)
-        instance.internationalNumber = validated_data.get('internationalNumber', instance.location)
-        instance.countryCallingCode = validated_data.get('countryCallingCode', instance.location)
-        instance.countryCode = validated_data.get('countryCode', instance.location)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.internationalNumber = validated_data.get('internationalNumber', instance.internationalNumber)
+        instance.countryCallingCode = validated_data.get('countryCallingCode', instance.countryCallingCode)
+        instance.countryCode = validated_data.get('countryCode', instance.countryCode)
         instance.save()
         return instance
 
