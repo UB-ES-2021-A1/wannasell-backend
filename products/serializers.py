@@ -13,7 +13,7 @@ class ProductSellerSerializer(serializers.Serializer):
     products = serializers.SerializerMethodField('get_products')
 
     def get_products(self, obj):
-        products = Product.objects.filter(seller=obj)
+        products = Product.objects.filter(seller=obj, sold=False)
         count = products.count()
         return count
 
@@ -43,6 +43,7 @@ class ProductDataSerializer(serializers.ModelSerializer):
         instance.description = validated_data.get('description', instance.description)
         instance.price = validated_data.get('price', instance.price)
         instance.category_name = validated_data.get('category_name', instance.category.name)
+        instance.sold = validated_data.get('sold', instance.sold)
         instance.save()
         return instance
 

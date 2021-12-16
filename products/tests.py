@@ -70,7 +70,8 @@ class ProductsTestCase(TestCase):
             'description': 'New description',
             'price': 2,
             'user': self.u,
-            'category_name': 'CO'
+            'category_name': 'CO',
+            'sold': True
         }
 
         prod_id = (Product.objects.get(title='Title')).id
@@ -82,6 +83,7 @@ class ProductsTestCase(TestCase):
         assert request.data['description'] == prod.description
         assert request.data['price'] == str(prod.price)
         assert request.data['category_name'] == prod.category.name
+        assert request.data['sold'] == prod.sold
         self.assertEqual(request.status_code, 200)
 
     def test_patch_product_not_found(self):
