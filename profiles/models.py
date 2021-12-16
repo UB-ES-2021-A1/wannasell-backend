@@ -14,7 +14,7 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to=user_directory_path, default='images/default/avatar/default.png')
     bio = models.TextField(max_length=500, blank=True)
     address = models.TextField(max_length=1024, blank=True)
-    location = models.TextField(max_length=100, blank=True)
+    location = models.TextField(max_length=1024, blank=True)
     phone = models.CharField(max_length=24, blank=True)
     countryCallingCode = models.CharField(max_length=5, blank=True)
     countryCode = models.CharField(max_length=2, blank=True)
