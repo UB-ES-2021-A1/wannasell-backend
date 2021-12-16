@@ -77,7 +77,7 @@ class ProfileDetailsSerializer(serializers.Serializer):
         return count
 
     def user_review_mean(self, obj):
-        reviews = Review.objects.filter(Q(seller=obj.user))
+        reviews = Review.objects.filter(Q(seller=obj.user) & Q(checked=True))
         mean = reviews.aggregate(Avg('val'))['val__avg']
         return mean
 
