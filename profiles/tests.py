@@ -47,7 +47,6 @@ class ProfileTestCase(TestCase):
 
     def test_profile_get_info(self):
         request = self.client.get('/api/v1/profile/')
-        print(request.data)
         assert request.data.get('bio') == 'Test Bio'
         assert request.data.get('address') == 'Test Address'
         assert request.data.get('location') == 'Test Location'
@@ -183,7 +182,6 @@ class ProfileTestCase(TestCase):
         assert request.status_code == 500
 
     def test_self_delete(self):
-        print(User.objects.get(id=1).username)
         request = self.client.delete('/api/v1/profile/')
         assert request.status_code == 200
 
@@ -229,8 +227,8 @@ class ProfileTestCase(TestCase):
         prod1 = Product.objects.create(price=5, category=cat, seller=self.user)
         prod2 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
         prod3 = Product.objects.create(price=5, category=cat, sold=True, seller=self.user)
-        review1 = Review.objects.create(reviewer=self.user, seller=self.user, val=3)
-        review2 = Review.objects.create(reviewer=self.user2, seller=self.user, val=4)
+        review1 = Review.objects.create(reviewer=self.user, seller=self.user, val=3, check=True)
+        review2 = Review.objects.create(reviewer=self.user2, seller=self.user, val=4, check=True)
         prod1.save()
         prod2.save()
         prod3.save()
