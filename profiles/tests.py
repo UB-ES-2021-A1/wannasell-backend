@@ -50,7 +50,6 @@ class ProfileTestCase(TestCase):
         assert request.data.get('bio') == 'Test Bio'
         assert request.data.get('address') == 'Test Address'
         assert request.data.get('location') == 'Test Location'
-        assert request.data.get('formatInternational') == '34659448329'
 
     def test_profile_get_info_disabled(self):
         request = self.client.get('/api/v1/profile/3/')
