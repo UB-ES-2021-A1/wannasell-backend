@@ -1,0 +1,9 @@
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Te damos la bienvenida desde {{ site_name }}!
+
+Estás recibiendo este mail porque {{ user_display }} acaba de dar tu dirección para registrarse en {{ site_domain }}.
+
+Para confirmar que eres tu, <a href="https://wannasell.netlify.com/confirmation/{{ key }}" target="_blank">Haga click aquí.</a>
+{% endblocktrans %}
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Muchas gracias de parte de {{ site_name }}!
+{{ site_domain }}{% endblocktrans %}
+{% endautoescape %}
