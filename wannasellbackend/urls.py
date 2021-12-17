@@ -30,5 +30,7 @@ urlpatterns = [
     url(r'^api/v1/accounts/', include('django.contrib.auth.urls')),
     url(r'^api/v1/profile/', include('profiles.urls')),
     path('api/v1/favorites/', include('favorites.urls')),
-    path('api/v1/products/', include('products.urls'))
+    path('api/v1/products/', include('products.urls')),
+    url(r'^api/v1/contact/', include('contact.urls')),
+    url(r'^api/v1/reviews/', include('reviews.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

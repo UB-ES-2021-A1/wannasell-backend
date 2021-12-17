@@ -8,24 +8,25 @@ from profiles.models import Profile
 class ProductSellerSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=100)
     first_name = serializers.CharField(max_length=500)
+    email = serializers.EmailField()
+    phone = serializers.SerializerMethodField('get_sellers_phone')
     products = serializers.SerializerMethodField('get_products')
-    avatar = serializers.SerializerMethodField('get_avatar')
 
     def get_products(self, obj):
-        products = Product.objects.filter(seller=obj)
+        products = Product.objects.filter(seller=obj, sold=False)
         count = products.count()
         return count
 
-    def get_avatar(self, obj):
+    def get_sellers_phone(self, obj):
         profile = Profile.objects.get(user=obj)
-        avatar = profile.avatar
-        return avatar.url
+        number = profile.internationalNumber
+        return number
 
 class ProductDataSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=500, allow_blank=False)
     description = serializers.CharField(max_length=1000, allow_blank=True)
-    price = serializers.DecimalField(max_digits=6, decimal_places=2)
+    price = serializers.DecimalField(max_digits=7, decimal_places=2)
     category_name = serializers.CharField(source='category.name')
     category_description = serializers.CharField(source='category.get_name_display')
     thumbnail = serializers.SerializerMethodField("get_thumbnail")
@@ -34,12 +35,21 @@ class ProductDataSerializer(serializers.ModelSerializer):
     favorites = serializers.SerializerMethodField('get_favs')
     views = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(format="%d-%b-%Y", read_only=True)
+    sold = serializers.BooleanField()
 
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.category_name = validated_data.get('category_name', instance.category.name)
+        instance.sold = validated_data.get('sold', instance.sold)
+        instance.save()
+        return instance
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'price', 'seller', 'thumbnail', 'category_name', 'category_description',
-                  'favorites_count', 'favorites', 'views', 'created_at']
+                  'favorites_count', 'favorites', 'views', 'created_at', 'sold']
 
     def get_thumbnail(self, obj):
         images = Image.objects.filter(product=obj)
@@ -66,8 +76,9 @@ class CategoryDataSerializer(serializers.ModelSerializer):
 
 
 class ImageDataSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     image = serializers.ImageField(allow_null=False)
 
     class Meta:
         model = Image
-        fields = ['image']
+        fields = ['id', 'image']

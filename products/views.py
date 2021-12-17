@@ -36,18 +36,18 @@ class ProductsView(APIView):
             id = request.GET.get('id')
             search = request.GET.get('search')
             seller = request.GET.get('seller')
-            qs = []
+            qs = [Q(sold=False)]
 
-            if category is not None and category is not '':
+            if category is not None and category != '':
                 qs.append(Q(category__name=category))
-            if search is not None and search is not '':
+            if search is not None and search != '':
                 qs.append(Q(title__icontains=search))
-            if id is not None and id is not "":
+            if id is not None and id != "":
                 qs.append(Q(id=id))
-            if seller is not None and seller is not "":
+            if seller is not None and seller != "":
                 qs.append(Q(seller__username=seller))
 
-            products = Product.objects.filter(reduce(operator.and_, qs)) if len(qs) > 0 else Product.objects.all()
+            products = Product.objects.filter(reduce(operator.and_, qs))
 
             products_serialized = [ProductDataSerializer(prod).data for prod in products]
             response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
@@ -76,6 +76,23 @@ class ProductsView(APIView):
         except:
             return Response("Couldn't create product ", status=status.HTTP_418_IM_A_TEAPOT)
         return Response({'id': p.id}, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        id = request.query_params['id']
+        try:
+            product = Product.objects.get(id=id)
+        except products.models.Product.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if request.data.get('category_name') is not None:
+            product.category = Category.objects.get(name=request.data.get('category_name'))
+
+        serialized_product = ProductDataSerializer(instance=product, data=request.data, partial=True)
+
+        if serialized_product.is_valid():
+            serialized_product.save()
+            return Response(serialized_product.data, status=status.HTTP_200_OK)
+        return Response(serialized_product.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductIdView(APIView):
@@ -160,3 +177,44 @@ class ImagesView(APIView):
             return Response(status=status.HTTP_418_IM_A_TEAPOT)
 
         return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        """
+        Delete an image
+        """
+        id = request.GET.get('id')
+        try:
+            image = Image.objects.get(id=id)
+            image.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class ProductSoldView(APIView):
+    serializer_class = ProductDataSerializer
+
+    permission_classes = [IsAuthenticated | ReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request):
+        try:
+            seller = request.GET.get('seller')
+            sold = request.GET.get('sold')
+
+            qs = [Q(sold=sold)]
+            if seller is not None and seller != "":
+                qs.append(Q(seller__username=seller))
+
+            if len(qs) < 2 or sold is None or sold == "":
+                return Response("Not enough arguments", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                products = Product.objects.filter(reduce(operator.and_, qs))
+                products_serialized = [ProductDataSerializer(prod).data for prod in products]
+                response_status = status.HTTP_200_OK if products else status.HTTP_204_NO_CONTENT
+                return Response(products_serialized, status=response_status)
+
+        except Exception as e:
+            print(e)
+
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

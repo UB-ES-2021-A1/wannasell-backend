@@ -61,6 +61,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     views = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    sold = models.BooleanField(default=0)
 
     def __str__(self):
         return self.title
