@@ -105,6 +105,21 @@ class ProductsTestCase(TestCase):
 
         self.assertEqual(request.status_code, 404)
 
+    def test_patch_product_set_to_sold(self):
+        p = Product.objects.create(title='Title', description='Description', price=1, seller=self.u,
+                                   category=self.c)
+        p.save()
+
+        data = {
+            'sold': True
+        }
+
+        url = "/api/v1/products/?id=" + str(p.id)
+        request = self.client.patch(url, data)
+
+        self.assertEqual(request.status_code, 200)
+        assert request.data['sold'] == True
+
     def test_get_product_by_id(self):
         Product.objects.create(title='Title', description='Description', price=1, seller=self.u, category=self.c)
         request = self.client.get("/api/v1/products/?id=1", format='json')
