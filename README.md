@@ -70,7 +70,8 @@
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-Blablabla
+Wannasell is a second hand selling website developed as an University Project as part of the Software Engineering subject.
+The website is based to reproduce a Wallapop's Clone using free frameworks and tools, and make it ready to start providing service in a final user version.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
